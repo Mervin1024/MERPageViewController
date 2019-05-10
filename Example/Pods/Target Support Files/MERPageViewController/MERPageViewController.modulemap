@@ -1,0 +1,6 @@
+framework module MERPageViewController {
+  umbrella header "MERPageViewController-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,16 @@
+PODS:
+  - MERPageViewController (0.1.0)
+
+DEPENDENCIES:
+  - MERPageViewController (from `../`)
+
+EXTERNAL SOURCES:
+  MERPageViewController:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  MERPageViewController: 26a62f1f6cb2a02e8ef2131861df249731a042e0
+
+PODFILE CHECKSUM: 55c5da43104bc5a78cc18aee2b87a6ed25733791
+
+COCOAPODS: 1.5.3

@@ -1,0 +1,6 @@
+framework module Pods_MERPageViewController_Example {
+  umbrella header "Pods-MERPageViewController_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}
