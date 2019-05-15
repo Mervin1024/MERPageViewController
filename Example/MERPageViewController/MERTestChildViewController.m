@@ -25,27 +25,27 @@
     [self.view addSubview:label];
     label.center = CGPointMake([UIScreen mainScreen].bounds.size.width/2, [UIScreen mainScreen].bounds.size.height/2);
     
-    NSLog(@"viewDidLoad :    %@", @(self.index));
+//    NSLog(@"viewDidLoad :    %@", @(self.index));
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    NSLog(@"Will Appear :    %@", @(self.index));
+//    NSLog(@"Will Appear :    %@", @(self.index));
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    NSLog(@"Did Appear :    %@", @(self.index));
+//    NSLog(@"Did Appear :    %@", @(self.index));
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    NSLog(@"Will Disappear :    %@", @(self.index));
+//    NSLog(@"Will Disappear :    %@", @(self.index));
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    NSLog(@"Did Disappear :    %@", @(self.index));
+//    NSLog(@"Did Disappear :    %@", @(self.index));
 }
 
 
