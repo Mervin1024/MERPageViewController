@@ -499,7 +499,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         UIView *lastView = [self controllerAtIndex:lastSelectedIndex].view;
         UIView *currentView = [self controllerAtIndex:currentPageIndex].view;
 
-        NSTimeInterval duration = 3;
+        NSTimeInterval duration = 0.3;
         
         // 取消之前的动画
         [self.switchAnimationContentView.layer removeAllAnimations];
@@ -544,7 +544,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         [self.switchAnimationContentView addSubview:currentView];
         lastView.frame = CGRectMake(lastViewStartOrigin.x, lastViewStartOrigin.y, pageSize.width, pageSize.height);
         currentView.frame = CGRectMake(currentViewStartOrigin.x, currentViewStartOrigin.y, pageSize.width, pageSize.height);;
-        [UIView animateWithDuration:duration delay:0 usingSpringWithDamping:1 initialSpringVelocity:1 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        [UIView animateWithDuration:duration delay:0 usingSpringWithDamping:1 initialSpringVelocity:3 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             lastView.frame = CGRectMake(lastViewAnimateToOrigin.x, lastViewAnimateToOrigin.y, pageSize.width, pageSize.height);
             currentView.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
         } completion:^(BOOL finished) {
