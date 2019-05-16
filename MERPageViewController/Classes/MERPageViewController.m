@@ -111,7 +111,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 }
 
 @property (nonatomic, strong) _MERQueuingScrollView *queuingScrollView;
-@property (nonatomic, strong) UIView *switchAnimationContentView;
 
 /**
  缓存 VC
@@ -133,15 +132,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         _queuingScrollView = [[_MERQueuingScrollView alloc] init];
     }
     return _queuingScrollView;
-}
-
-- (UIView *)switchAnimationContentView {
-    if (!_switchAnimationContentView) {
-        _switchAnimationContentView = [[UIView alloc] init];
-        _switchAnimationContentView.backgroundColor = [UIColor clearColor];
-        _switchAnimationContentView.userInteractionEnabled = NO;
-    }
-    return _switchAnimationContentView;
 }
 
 - (_MERCache<NSNumber *, UIViewController *> *)merCache {
@@ -190,7 +180,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     self.merCache.delegate = self;
     
     [self configureScrollView];
-    [self configureAnimationContentView];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -331,51 +320,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     [self.view addConstraints:constraints];
 }
 
-- (void)configureAnimationContentView {
-    self.switchAnimationContentView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:self.switchAnimationContentView];
-    // AutoLayout
-    NSMutableArray<NSLayoutConstraint*> *constraints = [NSMutableArray arrayWithCapacity:4];
-    [constraints addObject:({
-        [NSLayoutConstraint constraintWithItem:self.switchAnimationContentView
-                                     attribute:NSLayoutAttributeCenterX
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.queuingScrollView
-                                     attribute:NSLayoutAttributeCenterX
-                                    multiplier:1
-                                      constant:0];
-    })];
-    [constraints addObject:({
-        [NSLayoutConstraint constraintWithItem:self.switchAnimationContentView
-                                     attribute:NSLayoutAttributeCenterY
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.queuingScrollView
-                                     attribute:NSLayoutAttributeCenterY
-                                    multiplier:1
-                                      constant:0];
-    })];
-    [constraints addObject:({
-        [NSLayoutConstraint constraintWithItem:self.switchAnimationContentView
-                                     attribute:NSLayoutAttributeWidth
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.queuingScrollView
-                                     attribute:NSLayoutAttributeWidth
-                                    multiplier:1
-                                      constant:0];
-    })];
-    [constraints addObject:({
-        [NSLayoutConstraint constraintWithItem:self.switchAnimationContentView
-                                     attribute:NSLayoutAttributeHeight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.queuingScrollView
-                                     attribute:NSLayoutAttributeHeight
-                                    multiplier:1
-                                      constant:0];
-    })];
-    
-    [self.view addConstraints:constraints];
-}
-
 - (void)updateScrollViewLayoutIfNeeded {
     if (self.queuingScrollView.frame.size.width > 0) {
         CGFloat widht = self.pageCount * self.queuingScrollView.frame.size.width;
@@ -496,125 +440,83 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         MERPageScrollDirection direction = lastSelectedIndex < currentPageIndex ? MERPageScrollDirectionRight : MERPageScrollDirectionLeft;
         UIView *lastView = [self controllerAtIndex:lastSelectedIndex].view;
         UIView *currentView = [self controllerAtIndex:currentPageIndex].view;
+        UIView *oldSelectedView = [self controllerAtIndex:oldSelectedIndex].view;
         
         NSTimeInterval duration = 0.3;
+    
+        /**
+         fix :  当多个动画被触发时，在 scrollview 上的两个 subView (用于模拟动画的 lastView, currentView)之下会出现一个额外的无用 view。
+                用 tempView 存储这个额外的 View，并 hidden 它，在动画完成时重设 hidden 为 NO.
+         */
+        UIView *tempView = nil;
+        if (oldSelectedView.layer.animationKeys.count > 0 &&
+            lastView.layer.animationKeys.count > 0) {
+            NSInteger backgroundIndex = [self calculateIndexFromScrollViewOffsetX:self.queuingScrollView.contentOffset.x];
+            UIView *bgView = [self controllerAtIndex:backgroundIndex].view;
+            if (bgView != currentView && bgView != lastView) {
+                tempView = bgView;
+                tempView.hidden = YES;
+            }
+        }
         
         // 取消之前的动画
-        [self.switchAnimationContentView.layer removeAllAnimations];
+        [self.queuingScrollView.layer removeAllAnimations];
+        [oldSelectedView.layer removeAllAnimations];
         [lastView.layer removeAllAnimations];
         [currentView.layer removeAllAnimations];
         
-        // 计算动画需要的坐标
-//        CGPoint currentContentOffset = self.queuingScrollView.contentOffset;
-
-        CGPoint lastViewStartOrigin;
-        CGPoint currentViewStartOrigin;
-        CGPoint lastViewAnimateToOrigin;
-        CGPoint currentViewAnimateToOrigin;
-//        // 动画开始时，屏幕中只显示一个 view，只需要切换 lastView 和 currentView
-//        if (currentContentOffset.x == lastView.frame.origin.x) {
+        // 将不用于此次动画的 view 放置回 scrollView 的原位
+        [self moveChildControllerView:oldSelectedView backToOriginPositionIfNeeded:oldSelectedIndex];
         
-            // 计算动画需要的坐标
-            lastViewStartOrigin = CGPointZero;
-            currentViewStartOrigin = ({
-                CGPoint origin = lastViewStartOrigin;
-                if (direction == MERPageScrollDirectionRight) {
-                    origin.x += pageSize.width;
-                } else {
-                    origin.x -= pageSize.width;
-                }
-                origin;
-            });
-            
-            lastViewAnimateToOrigin = ({
-                CGPoint origin = lastViewStartOrigin;
-                if (direction == MERPageScrollDirectionRight) {
-                    origin.x -= pageSize.width;
-                } else {
-                    origin.x += pageSize.width;
-                }
-                origin;
-            });
-            currentViewAnimateToOrigin = lastViewStartOrigin;
-            
-        [self.switchAnimationContentView addSubview:lastView];
-        [self.switchAnimationContentView addSubview:currentView];
-            lastView.frame = CGRectMake(lastViewStartOrigin.x, lastViewStartOrigin.y, pageSize.width, pageSize.height);
-            currentView.frame = CGRectMake(currentViewStartOrigin.x, currentViewStartOrigin.y, pageSize.width, pageSize.height);;
-            [UIView animateWithDuration:duration delay:0 usingSpringWithDamping:1 initialSpringVelocity:3 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                lastView.frame = CGRectMake(lastViewAnimateToOrigin.x, lastViewAnimateToOrigin.y, pageSize.width, pageSize.height);
-                currentView.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
-            } completion:^(BOOL finished) {
-                // 被打断的动画不执行以下操作
-                if (finished) {
-                    [self moveChildControllerView:currentView backToOriginPositionIfNeeded:currentPageIndex];
-                    [self moveChildControllerView:lastView backToOriginPositionIfNeeded:lastSelectedIndex];
-                    scrollAnimationCompleted();
-                    scrollAfterAnimation();
-                }
-            }];
-        }
-//        // 动画开始时，屏幕就已经存在两个 view，此情况较为复杂
-//        else {
-//            // 如果需要跳转的目标就存在与当前屏幕
-//            if (currentPageIndex == lastSelectedIndex + 1 || currentPageIndex == lastSelectedIndex - 1) {
-//                // 计算动画需要的坐标
-//                lastViewStartOrigin = lastView.frame.origin;
-//                currentViewStartOrigin = ({
-//                    CGPoint origin = lastView.frame.origin;
-//                    if (direction == MERPageScrollDirectionRight) {
-//                        origin.x += pageSize.width;
-//                    } else {
-//                        origin.x -= pageSize.width;
-//                    }
-//                    origin;
-//                });
-//
-//                // 仅移动差值
-//                lastViewAnimateToOrigin = ({
-//                    CGPoint origin = lastView.frame.origin;
-//                    if (direction == MERPageScrollDirectionRight) {
-//                        origin.x =
-//                        origin.x -= origin.x + pageSize.width - currentContentOffset.x;
-//                    } else {
-//                        origin.x += pageSize.width;
-//                    }
-//                    origin;
-//                });
-//                currentViewAnimateToOrigin = lastView.frame.origin;
-//
-//                lastViewEndOrigin = lastView.frame.origin;
-//                currentViewEndOrigin = currentView.frame.origin;
-//
-//            }
-////            if (calculateLastViewOrigin.x > lastViewStartOrigin.x) {
-////                // 当前 view 处于屏幕靠右侧
-////                CGPoint origin = calculateLastViewOrigin;
-////                if (direction == MERPageScrollDirectionRight) {
-////                    // 向右滚动
-//////                    origin.x
-////                } else {
-////                    // 向左滚动
-////                    origin.x -= pageSize.width;
-////                }
-////
-////            } else {
-////
-////            }
-////
-////            lastViewAnimateToOrigin = ({
-////                CGPoint origin = lastView.frame.origin;
-////                if (direction == MERPageScrollDirectionRight) {
-////                    origin.x -= pageSize.width;
-////                } else {
-////                    origin.x += pageSize.width;
-////                }
-////                origin;
-////            });
-////            currentViewAnimateToOrigin = lastViewStartOrigin;
-//        }
-//
-//    }
+        // 把参与切换动画的两个 View 移动到最前面
+        [self.queuingScrollView bringSubviewToFront:lastView];
+        [self.queuingScrollView bringSubviewToFront:currentView];
+        lastView.hidden = NO;
+        currentView.hidden = NO;
+        
+        // 计算动画需要的坐标
+        CGPoint lastViewStartOrigin = lastView.frame.origin;
+        CGPoint currentViewStartOrigin = ({
+            CGPoint origin = lastView.frame.origin;
+            if (direction == MERPageScrollDirectionRight) {
+                origin.x += pageSize.width;
+            } else {
+                origin.x -= pageSize.width;
+            }
+            origin;
+        });
+        
+        CGPoint lastViewAnimateToOrigin = ({
+            CGPoint origin = lastView.frame.origin;
+            if (direction == MERPageScrollDirectionRight) {
+                origin.x -= pageSize.width;
+            } else {
+                origin.x += pageSize.width;
+            }
+            origin;
+        });
+        CGPoint currentViewAnimateToOrigin = lastViewStartOrigin;
+        
+        CGPoint lastViewEndOrigin = lastView.frame.origin;
+        CGPoint currentViewEndOrigin = currentView.frame.origin;
+        
+        lastView.frame = CGRectMake(lastViewStartOrigin.x, lastViewStartOrigin.y, pageSize.width, pageSize.height);
+        currentView.frame = CGRectMake(currentViewStartOrigin.x, currentViewStartOrigin.y, pageSize.width, pageSize.height);;
+        [UIView animateWithDuration:duration delay:0 usingSpringWithDamping:1 initialSpringVelocity:3 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            lastView.frame = CGRectMake(lastViewAnimateToOrigin.x, lastViewAnimateToOrigin.y, pageSize.width, pageSize.height);
+            currentView.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
+        } completion:^(BOOL finished) {
+            // 被打断的动画不执行以下操作
+            if (finished) {
+                lastView.frame = CGRectMake(lastViewEndOrigin.x, lastViewEndOrigin.y, pageSize.width, pageSize.height);
+                currentView.frame = CGRectMake(currentViewEndOrigin.x, currentViewEndOrigin.y, pageSize.width, pageSize.height);
+                [self moveChildControllerView:currentView backToOriginPositionIfNeeded:currentPageIndex];
+                [self moveChildControllerView:lastView backToOriginPositionIfNeeded:lastSelectedIndex];
+                scrollAnimationCompleted();
+                scrollAfterAnimation();
+            }
+        }];
+    }
     
 }
 
