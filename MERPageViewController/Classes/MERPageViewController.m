@@ -91,7 +91,6 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
     BOOL _firstDidAppear;           //用于界定页面首次DidAppear。
     BOOL _firstDidLayoutSubViews;   //用于界定页面首次DidLayoutsubviews。
     BOOL _firstWillLayoutSubViews;  //用于界定页面首次WillLayoutsubviews。
-    BOOL _isDecelerating;           //正在减速操作
 }
 
 @property (nonatomic, strong) _MERQueuingScrollView *queuingScrollView;
@@ -153,7 +152,6 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
     _firstDidAppear = YES;
     _firstDidLayoutSubViews = YES;
     _firstWillLayoutSubViews = YES;
-    _isDecelerating = NO;
 }
 
 #pragma mark ----------------- View lifecycle -----------------
@@ -596,11 +594,6 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 - (void)updatePageViewAfterTragging:(UIScrollView *)scrollView {
     NSInteger newIndex = [self calculateIndexFromScrollViewOffsetX:scrollView.contentOffset.x];
     
-    NSLog(@"BEG _%@,\nnewIndex : %@\n_guessToIndex : %@", NSStringFromSelector(_cmd), @(newIndex), @(self->_guessToIndex));
-    @onExit {
-        NSLog(@"END - %@，\n_currentIndex : %@\n_guessToIndex : %@\n_lastSelectedIndex : %@", NSStringFromSelector(_cmd), @(self->_currentPageIndex), @(self->_guessToIndex), @(self->_lastSelectedIndex));
-    };
-
     NSInteger oldIndex = _currentPageIndex;
     _currentPageIndex = newIndex;
     
@@ -629,12 +622,10 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
     _originOffset = scrollView.contentOffset.x;
     _guessToIndex = _currentPageIndex;
     
-    [self pageViewControllerDidShowFromIndex:oldIndex toIndex:newIndex animated:YES];
+    [self pageViewControllerDidTransitionFromIndex:oldIndex toIndex:newIndex];
     if ([self.delegate respondsToSelector:@selector(mer_pageViewController:didTransitionFrom:toViewController:)]) {
         [self.delegate mer_pageViewController:self didTransitionFrom:oldIndexVC toViewController:newIndexVC];
     }
-    
-    _isDecelerating = NO;
     
     [self removeOtherChildVC];
 }
@@ -642,14 +633,6 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 #pragma mark ----------------- UIScrollViewDelegate -----------------
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    // 不计非交互拖动状态
-    if (!scrollView.isDragging) return;
-    
-    NSLog(@"BEG _%@", NSStringFromSelector(_cmd));
-    @onExit {
-        NSLog(@"END - %@，\n_currentIndex : %@\n_guessToIndex : %@\n_lastSelectedIndex : %@", NSStringFromSelector(_cmd), @(self->_currentPageIndex), @(self->_guessToIndex), @(self->_lastSelectedIndex));
-    };
-
     CGFloat offsetX = scrollView.contentOffset.x;
     CGFloat widht = scrollView.frame.size.width;
     NSInteger lastGuessIndex = _guessToIndex < 0 ? _currentPageIndex : _guessToIndex;
@@ -679,7 +662,7 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
     UIViewController *guessToIndexVC = [self controllerAtIndex:_guessToIndex];
     UIViewController *currentIndexVC = [self controllerAtIndex:_currentPageIndex];
 
-    [self pageViewControllerWillShowFromIndex:_currentPageIndex toIndex:_guessToIndex animated:YES];
+    [self pageViewControllerWillTransitionFromIndex:_currentPageIndex toIndex:_guessToIndex];
     if ([self.delegate respondsToSelector:@selector(mer_pageViewController:willTransitionFrom:toViewController:)]) {
         [self.delegate mer_pageViewController:self
                            willTransitionFrom:currentIndexVC
@@ -699,20 +682,10 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 
 // 手指拖动后抬起
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
-    NSLog(@"BEG _%@", NSStringFromSelector(_cmd));
-    @onExit {
-        NSLog(@"END - %@，\n_currentIndex : %@\n_guessToIndex : %@\n_lastSelectedIndex : %@", NSStringFromSelector(_cmd), @(self->_currentPageIndex), @(self->_guessToIndex), @(self->_lastSelectedIndex));
-    };
-    _isDecelerating = YES;
 }
 
 // 视图结束滚动
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    NSLog(@"BEG _%@", NSStringFromSelector(_cmd));
-    NSLog(@"contentOffsetX : %@", @(scrollView.contentOffset.x));
-    @onExit {
-        NSLog(@"END - %@，\n_currentIndex : %@\n_guessToIndex : %@\n_lastSelectedIndex : %@", NSStringFromSelector(_cmd), @(self->_currentPageIndex), @(self->_guessToIndex), @(self->_lastSelectedIndex));
-    };
     if (!scrollView.isDragging) {
         [self updatePageViewAfterTragging:scrollView];
     }
@@ -720,10 +693,6 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 
 // 开始拖动（需要 scrollViewDidScroll 一定距离和时间后，这里才会被调用）
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    NSLog(@"BEG _%@", NSStringFromSelector(_cmd));
-    @onExit {
-        NSLog(@"END - %@，\n_currentIndex : %@\n_guessToIndex : %@\n_lastSelectedIndex : %@", NSStringFromSelector(_cmd), @(self->_currentPageIndex), @(self->_guessToIndex), @(self->_lastSelectedIndex));
-    };
     if (!scrollView.isDecelerating) {
         _originOffset = scrollView.contentOffset.x;
         _guessToIndex = _currentPageIndex;
@@ -732,34 +701,20 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 
 // 手指拖动后抬起，可以重设停止目标。 velocity 单位为 points/millisecond
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
-    NSLog(@"BEG _%@", NSStringFromSelector(_cmd));
-    @onExit {
-        NSLog(@"END - %@，\n_currentIndex : %@\n_guessToIndex : %@\n_lastSelectedIndex : %@", NSStringFromSelector(_cmd), @(self->_currentPageIndex), @(self->_guessToIndex), @(self->_lastSelectedIndex));
-    };
     CGFloat offsetX = scrollView.contentOffset.x;
     CGFloat width = scrollView.frame.size.width;
 
-    NSLog(@"原始减速位置 ：%@", @((*targetContentOffset).x));
     if (velocity.x > 0) {
         // 手指向左，滚动到右向视图
-        CGFloat maxTargetOffsetX = ceil(offsetX/width) * width;
-        if ((*targetContentOffset).x > maxTargetOffsetX) {
-            (*targetContentOffset).x = maxTargetOffsetX;
-        }
         if (scrollView.isDecelerating) {
             _originOffset = floor(offsetX/width) * width;
         }
     } else if (velocity.x < 0) {
         // 手指向右，滚动到左向视图
-        CGFloat minTargetOffsetX = floor(offsetX/width) * width;
-        if ((*targetContentOffset).x < minTargetOffsetX) {
-            (*targetContentOffset).x = minTargetOffsetX;
-        }
         if (scrollView.isDecelerating) {
             _originOffset = ceil(offsetX/width) * width;
         }
     }
-    NSLog(@"重设减速位置 ：%@", @((*targetContentOffset).x));
     
     // 手指抬起的时候，刚好不需要任何减速就停留在目标位置，则主动调用刷新 page。
     if ((int)(offsetX * 100) % (int)(width * 100) == 0) {
@@ -771,10 +726,6 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 #pragma mark ----------------- NSCacheDelegate -----------------
 
 - (void)cache:(NSCache *)cache willEvictObject:(id)obj {
-    NSLog(@"BEG _%@", NSStringFromSelector(_cmd));
-    @onExit {
-        NSLog(@"END - %@，\n_currentIndex : %@\n_guessToIndex : %@\n_lastSelectedIndex : %@", NSStringFromSelector(_cmd), @(self->_currentPageIndex), @(self->_guessToIndex), @(self->_lastSelectedIndex));
-    };
     if (![obj isKindOfClass:UIViewController.class]) return;
     if (![self.childViewControllers containsObject:obj]) return;
     
@@ -816,8 +767,8 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 
 #pragma mark ----------------- Subclass Override -----------------
 
-- (void)pageViewControllerWillTransitonFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex {}
-- (void)pageViewControllerDidTransitonFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex {}
+- (void)pageViewControllerWillTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex {}
+- (void)pageViewControllerDidTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex {}
 - (void)pageViewControllerWillShowFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex animated:(BOOL)animated{}
 - (void)pageViewControllerDidShowFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex animated:(BOOL)animated{}
 

@@ -7,7 +7,7 @@
 
 #import <UIKit/UIKit.h>
 
-void blockCleanUp(__strong void(^*block)(void));
+void blockCleanUp(__strong void(^_Nonnull* _Nonnull block)(void));
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -61,9 +61,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Override，no need to call super
 
 // 当手势切换发起时调用
-- (void)pageViewControllerWillTransitonFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
+- (void)pageViewControllerWillTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
 // 当手势切换结束时调用
-- (void)pageViewControllerDidTransitonFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
+- (void)pageViewControllerDidTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
 // 当 -showPageAtIndex:animated: 触发时调用
 - (void)pageViewControllerWillShowFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex animated:(BOOL)animated;
 // 当 -showPageAtIndex:animated: 完成时调用
