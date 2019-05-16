@@ -5,15 +5,8 @@
 //  Created by mayao's Mac on 2019/5/5.
 //
 
-void blockCleanUp(__strong void(^*block)(void)) {
-    (*block)();
-}
-
-#define onExit \
-autoreleasepool{} \
-__strong void(^block)(void) __attribute__((cleanup(blockCleanUp), unused)) = ^
-
 #import "MERPageViewController.h"
+#import <objc/runtime.h>
 
 typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
     MERPageScrollDirectionLeft,
@@ -22,22 +15,23 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 
 @interface UIViewController (MERPageChildController)
 
-- (void)mer_addChildViewController:(UIViewController *)childViewController;
-- (void)mer_addChildViewController:(UIViewController *)childViewController frame:(CGRect)frame;
-- (void)mer_addChildViewController:(UIViewController *)childViewController inView:(UIView *)inView frame:(CGRect)frame;
+@property (nonatomic, strong) id mer_cacheKey;
 
+- (void)mer_addChildViewController:(UIViewController *)childViewController inView:(UIView *)inView frame:(CGRect)frame;
 - (void)mer_removeFromParentViewController;
 
 @end
 
 @implementation UIViewController (MERPageChildController)
 
-- (void)mer_addChildViewController:(UIViewController *)childViewController {
-    [self mer_addChildViewController:childViewController inView:self.view frame:self.view.bounds];
+static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
+
+- (void)setMer_cacheKey:(id)mer_cacheKey {
+    objc_setAssociatedObject(self, kMERUIViewControllerCacheKey, mer_cacheKey, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (void)mer_addChildViewController:(UIViewController *)childViewController frame:(CGRect)frame {
-    [self mer_addChildViewController:childViewController inView:self.view frame:frame];
+- (id)mer_cacheKey {
+    return objc_getAssociatedObject(self, kMERUIViewControllerCacheKey);
 }
 
 - (void)mer_addChildViewController:(UIViewController *)childViewController inView:(UIView *)inView frame:(CGRect)frame {
@@ -71,6 +65,21 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 
 @end
 
+@interface _MERCache <KeyType, ObjectType> : NSCache
+
+@end
+
+@implementation _MERCache
+
+- (void)setObject:(id)obj forKey:(id)key {
+    [super setObject:obj forKey:key];
+    if ([obj isKindOfClass:UIViewController.class]) {
+        [(UIViewController*)obj setMer_cacheKey:key];
+    }
+}
+
+@end
+
 @interface _MERQueuingScrollView : UIScrollView
 
 @end
@@ -97,7 +106,7 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 /**
  缓存 VC
  */
-@property (nonatomic, strong) NSCache<NSNumber *, UIViewController *> *merCache;
+@property (nonatomic, strong) _MERCache<NSNumber *, UIViewController *> *merCache;
 /**
  即将被从列表页面中移出的 VC 集合
  */
@@ -116,9 +125,9 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
     return _queuingScrollView;
 }
 
-- (NSCache<NSNumber *, UIViewController *> *)merCache {
+- (_MERCache<NSNumber *, UIViewController *> *)merCache {
     if (!_merCache) {
-        _merCache = [[NSCache alloc] init];
+        _merCache = [[_MERCache alloc] init];
         _merCache.countLimit = 3;
     }
     return _merCache;
@@ -325,6 +334,21 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
 
 #pragma mark ----------------- Public -----------------
 
+- (void)reloadData {
+    [self.merCache removeAllObjects];
+    
+    _currentPageIndex = MAX(_currentPageIndex, self.pageCount-1);
+    UIViewController *currentVC = [self controllerAtIndex:_currentPageIndex];
+    if (!currentVC) return;
+    
+    [self.merCache setObject:currentVC forKey:@(_currentPageIndex)];
+    
+    [currentVC beginAppearanceTransition:YES animated:NO];
+    [self updateScrollViewLayoutIfNeeded];
+    [self updateScrollViewDisplayIndexIfNeeded];
+    [currentVC endAppearanceTransition];
+}
+
 /**
  通过代码直接更改当前显示 VC，区别于手部拖动更改 VC
 
@@ -503,10 +527,21 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
     return self.queuingScrollView.scrollEnabled;
 }
 
+- (BOOL)currentIndex {
+    return _currentPageIndex;
+}
+
+- (UIViewController *)currentViewController {
+    return [self controllerAtIndex:self.currentIndex];
+}
+
 #pragma mark ----------------- Getter -----------------
 
 - (UIViewController *)controllerAtIndex:(NSInteger)index {
     if (index >= self.pageCount || index < 0) return nil;
+    
+    UIViewController *controller = [self.merCache objectForKey:@(index)];
+    if (controller) return controller;
     
     if ([self.dataSource respondsToSelector:@selector(mer_pageViewController:controllerAtIndex:)]) {
         return [self.dataSource mer_pageViewController:self controllerAtIndex:index];
@@ -730,14 +765,14 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
     if (![self.childViewControllers containsObject:obj]) return;
     
     UIViewController *vc = (UIViewController *)obj;
+    NSNumber *cacheKey = vc.mer_cacheKey;
+    NSInteger index = cacheKey?cacheKey.integerValue:NSNotFound;
     // 当 queuingScrollView 处于 isDragging 状态，Tracking 和 Decelerating 状态都是 NO。
     // 判断全部为 NO ，代表着缓存清除不是由连续的页面交互触发的
     if (!self.queuingScrollView.isDragging &&
         !self.queuingScrollView.isTracking &&
         !self.queuingScrollView.isDecelerating) {
-        UIViewController *lastPage = [self controllerAtIndex:_lastSelectedIndex];
-        UIViewController *currentPage = [self controllerAtIndex:_currentPageIndex];
-        if (lastPage == vc || currentPage == vc) {
+        if (_lastSelectedIndex == index || _currentPageIndex == index) {
             [self.childWillRemove addObject:vc];
         }
     } else if (self.queuingScrollView.isDragging) {
@@ -750,12 +785,8 @@ typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
         if (rightIndex > self.pageCount - 1) {
             rightIndex = _guessToIndex;
         }
-        
-        UIViewController *leftNeighbourVC = [self controllerAtIndex:leftIndex];
-        UIViewController *midPage = [self controllerAtIndex:_guessToIndex];
-        UIViewController *rightNeighbourVC = [self controllerAtIndex:rightIndex];
-        
-        if (leftNeighbourVC == vc || rightNeighbourVC == vc || midPage == vc) {
+                
+        if (leftIndex == index || rightIndex == index || _guessToIndex == index) {
             [self.childWillRemove addObject:vc];
         }
     }

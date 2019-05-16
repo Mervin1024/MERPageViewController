@@ -36,12 +36,30 @@
         controller.index = i;
         [self.pageControllers addObject:controller];
     }
+    
+    
+    
+    UIButton *touchButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [touchButton setTitle:@"随机跳转" forState:UIControlStateNormal];
+    [touchButton sizeToFit];
+    [self.view addSubview:touchButton];
+    touchButton.center = CGPointMake(self.view.center.x, self.view.center.y - 100);
+    [touchButton addTarget:self action:@selector(touchButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)touchButtonPressed:(id)sender {
+    NSInteger currentIndex = self.pageViewController.currentIndex;
+    NSInteger targetIndex;
+    do {
+        targetIndex = arc4random()%(self.pageControllers.count);
+    } while (currentIndex == targetIndex);
+    [self.pageViewController showPageAtIndex:targetIndex animated:YES];
 }
 
 #pragma mark ----------------- MERPageViewControllerDataSource -----------------

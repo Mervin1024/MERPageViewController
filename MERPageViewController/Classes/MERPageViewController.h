@@ -7,8 +7,6 @@
 
 #import <UIKit/UIKit.h>
 
-void blockCleanUp(__strong void(^_Nonnull* _Nonnull block)(void));
-
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MERPageViewControllerDelegate, MERPageViewControllerDataSource;
@@ -20,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) UIEdgeInsets contentInsets;
 
+@property (nonatomic, readonly, assign) BOOL currentIndex;
+@property (nullable, nonatomic, readonly, weak) UIViewController *currentViewController;
+
 /**
  是否支持弹性效果，默认为 YES
  */
@@ -30,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL pageScrollEnable;
 
 - (void)showPageAtIndex:(NSInteger)index animated:(BOOL)animated;
+
+- (void)reloadData;
 
 @end
 
