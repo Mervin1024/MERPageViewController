@@ -7,8 +7,6 @@
 
 #import <UIKit/UIKit.h>
 
-void blockCleanUp(__strong void(^_Nonnull* _Nonnull block)(void));
-
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MERPageViewControllerDelegate, MERPageViewControllerDataSource;
