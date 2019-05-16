@@ -28,7 +28,7 @@
     [self.view addSubview:self.pageViewController.view];
     self.pageViewController.view.frame = [UIScreen mainScreen].bounds;
     
-//    self.pageViewController.pageBounces = NO;
+    self.pageViewController.pageBounces = NO;
     
     self.pageControllers = [NSMutableArray arrayWithCapacity:10];
     for (int i = 0; i < 10; i++) {
