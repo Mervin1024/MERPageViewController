@@ -516,7 +516,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         // 记录当前动画 key
         NSTimeInterval currentKey = [NSDate timeIntervalSinceReferenceDate];
         _animationKey = currentKey;
-
+        
         // 计算动画需要的坐标
         CGPoint lastViewStartOrigin = CGPointZero;
         CGPoint currentViewStartOrigin = ({
@@ -549,7 +549,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
             currentView.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
         } completion:^(BOOL finished) {
             // 被打断的动画不执行以下操作
-            if (self->_animationKey >= currentKey) {
+            if (self->_animationKey == currentKey) {
                 [self moveChildControllerView:currentView backToOriginPositionIfNeeded:currentPageIndex];
                 [self moveChildControllerView:lastView backToOriginPositionIfNeeded:lastSelectedIndex];
                 scrollAnimationCompleted();
