@@ -106,6 +106,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 }
 
 @property (nonatomic, strong) _MERQueuingScrollView *queuingScrollView;
+@property (nonatomic, strong) NSMutableArray<NSLayoutConstraint*> *queuingScrollViewConstraints;
 
 @property (nonatomic, strong) UIView *switchAnimationContentView;
 
@@ -325,6 +326,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     })];
     
     [self.view addConstraints:constraints];
+    self.queuingScrollViewConstraints = constraints;
 }
 
 - (void)configureAnimationContentView {
@@ -595,6 +597,23 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 
 - (UIViewController *)currentViewController {
     return [self controllerAtIndex:self.currentIndex];
+}
+
+- (void)setContentInsets:(UIEdgeInsets)contentInsets {
+    if (UIEdgeInsetsEqualToEdgeInsets(_contentInsets, contentInsets)) return;
+    _contentInsets = contentInsets;
+    [self.queuingScrollViewConstraints enumerateObjectsUsingBlock:^(NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (obj.firstAttribute == NSLayoutAttributeLeading) {
+            obj.constant = contentInsets.left;
+        } else if (obj.firstAttribute == NSLayoutAttributeTrailing) {
+            obj.constant = contentInsets.right;
+        } else if (obj.firstAttribute == NSLayoutAttributeTop) {
+            obj.constant = contentInsets.top;
+        } else if (obj.firstAttribute == NSLayoutAttributeBottom) {
+            obj.constant = contentInsets.bottom;
+        }
+    }];
+    [self.queuingScrollView layoutIfNeeded];
 }
 
 #pragma mark ----------------- Getter -----------------

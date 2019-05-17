@@ -76,6 +76,7 @@
 
 - (void)reloadButtonPressed:(id)sender {
     self.pageControllers = nil;
+    self.pageViewController.contentInsets = UIEdgeInsetsMake(arc4random()%100, 0, 0, 0);
     [self.pageViewController reloadData];
 }
 
