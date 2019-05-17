@@ -72,10 +72,10 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 @implementation _MERCache
 
 - (void)setObject:(id)obj forKey:(id)key {
-    [super setObject:obj forKey:key];
     if ([obj isKindOfClass:UIViewController.class]) {
         [(UIViewController*)obj setMer_cacheKey:key];
     }
+    [super setObject:obj forKey:key];
 }
 
 @end
@@ -396,13 +396,27 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 #pragma mark ----------------- Public -----------------
 
 - (void)reloadData {
+    _currentPageIndex = MIN(_currentPageIndex, self.pageCount-1);
+    UIViewController *currentVC = ({
+        UIViewController *vc = nil;
+        if ([self.dataSource respondsToSelector:@selector(mer_pageViewController:controllerAtIndex:)]) {
+            vc = [self.dataSource mer_pageViewController:self controllerAtIndex:_currentPageIndex];
+        }
+        vc;
+    });
+    if (!currentVC) {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"[%@ - controllerAtIndex:] Return value nil is illegal",
+         NSStringFromClass([self class])];
+    }
+
     [self.merCache removeAllObjects];
-    
-    _currentPageIndex = MAX(_currentPageIndex, self.pageCount-1);
-    UIViewController *currentVC = [self controllerAtIndex:_currentPageIndex];
-    if (!currentVC) return;
-    
     [self.merCache setObject:currentVC forKey:@(_currentPageIndex)];
+
+    [self.childWillRemove enumerateObjectsUsingBlock:^(UIViewController * _Nonnull obj, BOOL * _Nonnull stop) {
+        [obj mer_removeFromParentViewController];
+    }];
+    [self.childWillRemove removeAllObjects];
     
     [currentVC beginAppearanceTransition:YES animated:NO];
     [self updateScrollViewLayoutIfNeeded];
@@ -496,21 +510,21 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         // variables
         CGSize pageSize = self.queuingScrollView.frame.size;
         MERPageScrollDirection direction = lastSelectedIndex < currentPageIndex ? MERPageScrollDirectionRight : MERPageScrollDirectionLeft;
-        UIView *lastView = [self controllerAtIndex:lastSelectedIndex].view;
-        UIView *currentView = [self controllerAtIndex:currentPageIndex].view;
+        UIViewController *lastVC = [self controllerAtIndex:lastSelectedIndex];
+        UIViewController *currentVC = [self controllerAtIndex:currentPageIndex];
 
         NSTimeInterval duration = 0.3;
         
         // 取消之前的动画
         [self.switchAnimationContentView.layer removeAllAnimations];
-        [lastView.layer removeAllAnimations];
-        [currentView.layer removeAllAnimations];
+        [lastVC.view.layer removeAllAnimations];
+        [currentVC.view.layer removeAllAnimations];
         
         // 将不用于此次动画的 view 放置回 scrollView 的原位
         if (oldSelectedIndex != lastSelectedIndex || oldSelectedIndex != currentPageIndex) {
-            UIView *oldSelectedView = [self controllerAtIndex:oldSelectedIndex].view;
-            [oldSelectedView.layer removeAllAnimations];
-            [self moveChildControllerView:oldSelectedView backToOriginPositionIfNeeded:oldSelectedIndex];
+            UIViewController *oldSelectedVC = [self controllerAtIndex:oldSelectedIndex];
+            [oldSelectedVC.view.layer removeAllAnimations];
+            [self moveChildController:oldSelectedVC backToOriginPositionIfNeeded:oldSelectedIndex];
         }
 
         // 记录当前动画 key
@@ -540,18 +554,18 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         });
         CGPoint currentViewAnimateToOrigin = lastViewStartOrigin;
             
-        [self.switchAnimationContentView addSubview:lastView];
-        [self.switchAnimationContentView addSubview:currentView];
-        lastView.frame = CGRectMake(lastViewStartOrigin.x, lastViewStartOrigin.y, pageSize.width, pageSize.height);
-        currentView.frame = CGRectMake(currentViewStartOrigin.x, currentViewStartOrigin.y, pageSize.width, pageSize.height);;
+        [self.switchAnimationContentView addSubview:lastVC.view];
+        [self.switchAnimationContentView addSubview:currentVC.view];
+        lastVC.view.frame = CGRectMake(lastViewStartOrigin.x, lastViewStartOrigin.y, pageSize.width, pageSize.height);
+        currentVC.view.frame = CGRectMake(currentViewStartOrigin.x, currentViewStartOrigin.y, pageSize.width, pageSize.height);;
         [UIView animateWithDuration:duration delay:0 usingSpringWithDamping:1 initialSpringVelocity:3 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            lastView.frame = CGRectMake(lastViewAnimateToOrigin.x, lastViewAnimateToOrigin.y, pageSize.width, pageSize.height);
-            currentView.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
+            lastVC.view.frame = CGRectMake(lastViewAnimateToOrigin.x, lastViewAnimateToOrigin.y, pageSize.width, pageSize.height);
+            currentVC.view.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
         } completion:^(BOOL finished) {
             // 被打断的动画不执行以下操作
             if (self->_animationKey == currentKey) {
-                [self moveChildControllerView:currentView backToOriginPositionIfNeeded:currentPageIndex];
-                [self moveChildControllerView:lastView backToOriginPositionIfNeeded:lastSelectedIndex];
+                [self moveChildController:currentVC backToOriginPositionIfNeeded:currentPageIndex];
+                [self moveChildController:lastVC backToOriginPositionIfNeeded:lastSelectedIndex];
                 scrollAnimationCompleted();
                 scrollAfterAnimation();
             }
@@ -656,17 +670,18 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     [self.childWillRemove removeAllObjects];
 }
 
-- (void)moveChildControllerView:(UIView *)view backToOriginPositionIfNeeded:(NSInteger)index {
+- (void)moveChildController:(UIViewController *)viewController backToOriginPositionIfNeeded:(NSInteger)index {
     if (index < 0 || index >= self.pageCount) return;
-    if (!view) return;
+    if (!viewController) return;
+    if (!viewController.parentViewController) return;
     CGPoint originPosition = [self calculateVisibleViewOffsetForIndex:index];
-    if (view.frame.origin.x != originPosition.x || ![self.queuingScrollView.subviews containsObject:view]) {
-        view.frame = ({
-            CGRect frame = view.frame;
+    if (viewController.view.frame.origin.x != originPosition.x || ![self.queuingScrollView.subviews containsObject:viewController.view]) {
+        viewController.view.frame = ({
+            CGRect frame = viewController.view.frame;
             frame.origin = originPosition;
             frame;
         });
-        [self.queuingScrollView addSubview:view];
+        [self.queuingScrollView addSubview:viewController.view];
     }
     
 }
@@ -845,7 +860,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         }
     }
     
-    if (self.childWillRemove.count > 0) return;
+    if ([self.childWillRemove containsObject:vc]) return;
 
     [vc mer_removeFromParentViewController];
 }

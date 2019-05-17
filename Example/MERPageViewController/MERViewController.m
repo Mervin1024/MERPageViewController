@@ -17,6 +17,18 @@
 
 @implementation MERViewController
 
+- (NSMutableArray<UIViewController *> *)pageControllers {
+    if (!_pageControllers) {
+        _pageControllers = [NSMutableArray arrayWithCapacity:10];
+        for (int i = 0; i < 10; i++) {
+            MERTestChildViewController *controller = [[MERTestChildViewController alloc] init];
+            controller.index = i;
+            [_pageControllers addObject:controller];
+        }
+    }
+    return _pageControllers;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -30,14 +42,6 @@
     
     self.pageViewController.pageBounces = NO;
     
-    self.pageControllers = [NSMutableArray arrayWithCapacity:10];
-    for (int i = 0; i < 10; i++) {
-        MERTestChildViewController *controller = [[MERTestChildViewController alloc] init];
-        controller.index = i;
-        [self.pageControllers addObject:controller];
-    }
-    
-    
     
     UIButton *touchButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [touchButton setTitle:@"随机跳转" forState:UIControlStateNormal];
@@ -45,6 +49,14 @@
     [self.view addSubview:touchButton];
     touchButton.center = CGPointMake(self.view.center.x, self.view.center.y - 100);
     [touchButton addTarget:self action:@selector(touchButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *reloadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [reloadButton setTitle:@"刷新数据" forState:UIControlStateNormal];
+    [reloadButton sizeToFit];
+    [self.view addSubview:reloadButton];
+    reloadButton.center = CGPointMake(self.view.center.x, self.view.center.y + 100);
+    [reloadButton addTarget:self action:@selector(reloadButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+
 }
 
 - (void)didReceiveMemoryWarning
@@ -62,6 +74,11 @@
     [self.pageViewController showPageAtIndex:targetIndex animated:YES];
 }
 
+- (void)reloadButtonPressed:(id)sender {
+    self.pageControllers = nil;
+    [self.pageViewController reloadData];
+}
+
 #pragma mark ----------------- MERPageViewControllerDataSource -----------------
 
 - (nonnull UIViewController *)mer_pageViewController:(nonnull MERPageViewController *)pageViewController controllerAtIndex:(NSInteger)index {
@@ -76,19 +93,19 @@
 #pragma mark ----------------- MERPageViewControllerDelegate -----------------
 
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController willTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController {
-    NSLog(@"will Transition From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
+//    NSLog(@"will Transition From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
 }
 
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController didTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController {
-    NSLog(@"Did Transition From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
+//    NSLog(@"Did Transition From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
 }
 
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController willSwitchControllerFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController animated:(BOOL)animated {
-    NSLog(@"will Swtich From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
+//    NSLog(@"will Swtich From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
 }
 
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController didSwitchControllerFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController animated:(BOOL)animated {
-    NSLog(@"Did Switch From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
+//    NSLog(@"Did Switch From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
 }
 
 @end
