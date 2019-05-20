@@ -559,8 +559,8 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         [self.switchAnimationContentView addSubview:lastVC.view];
         [self.switchAnimationContentView addSubview:currentVC.view];
         lastVC.view.frame = CGRectMake(lastViewStartOrigin.x, lastViewStartOrigin.y, pageSize.width, pageSize.height);
-        currentVC.view.frame = CGRectMake(currentViewStartOrigin.x, currentViewStartOrigin.y, pageSize.width, pageSize.height);;
-        [UIView animateWithDuration:duration delay:0 usingSpringWithDamping:1 initialSpringVelocity:3 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        currentVC.view.frame = CGRectMake(currentViewStartOrigin.x, currentViewStartOrigin.y, pageSize.width, pageSize.height);
+        [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             lastVC.view.frame = CGRectMake(lastViewAnimateToOrigin.x, lastViewAnimateToOrigin.y, pageSize.width, pageSize.height);
             currentVC.view.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
         } completion:^(BOOL finished) {
