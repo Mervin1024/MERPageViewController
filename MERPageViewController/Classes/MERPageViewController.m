@@ -437,7 +437,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
  @param index 目标索引
  @param animated 是否动画形式切换
  */
-- (void)showPageAtIndex:(NSInteger)index animated:(BOOL)animated {
+- (void)showPageAtIndex:(NSInteger)index animated:(BOOL)animated completion:(void (^ _Nullable)(BOOL))completion {
     if (index < 0 || index >= self.pageCount) {
         return;
     }
@@ -506,6 +506,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         // 关闭动画或跳转当前页
         scrollAnimationCompleted();
         scrollAfterAnimation();
+        !completion?:completion(YES);
     } else {
         // 跳转其他页面，模拟动画
         
@@ -565,12 +566,14 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
             currentVC.view.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
         } completion:^(BOOL finished) {
             // 被打断的动画不执行以下操作
-            if (self->_animationKey == currentKey) {
+            BOOL completed = self->_animationKey == currentKey;
+            if (completed) {
                 [self moveChildController:currentVC backToOriginPositionIfNeeded:currentPageIndex];
                 [self moveChildController:lastVC backToOriginPositionIfNeeded:lastSelectedIndex];
                 scrollAnimationCompleted();
                 scrollAfterAnimation();
             }
+            !completion?:completion(completed);
         }];
     }
 }

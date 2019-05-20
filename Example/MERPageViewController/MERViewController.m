@@ -71,7 +71,7 @@
     do {
         targetIndex = arc4random()%(self.pageControllers.count);
     } while (currentIndex == targetIndex);
-    [self.pageViewController showPageAtIndex:targetIndex animated:YES];
+    [self.pageViewController showPageAtIndex:targetIndex animated:YES completion:nil];
 }
 
 - (void)reloadButtonPressed:(id)sender {

@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) BOOL pageScrollEnable;
 
-- (void)showPageAtIndex:(NSInteger)index animated:(BOOL)animated;
+- (void)showPageAtIndex:(NSInteger)index animated:(BOOL)animated completion:(void(^_Nullable)(BOOL finished))completion;
 
 - (void)reloadData;
 
