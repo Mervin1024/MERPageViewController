@@ -109,4 +109,12 @@
 //    NSLog(@"Did Switch From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
 }
 
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollByDragging:(UIScrollView *)scrollView {
+    NSLog(@"scrollViewDidScrollByDragging ： %@", @(scrollView.contentOffset.x));
+}
+
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollBySwitching:(UIScrollView *)scrollView {
+    NSLog(@"scrollViewDidScrollBySwitching ： %@", @(scrollView.contentOffset.x));
+}
+
 @end

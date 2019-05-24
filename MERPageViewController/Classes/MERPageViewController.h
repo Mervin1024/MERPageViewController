@@ -43,10 +43,11 @@ NS_ASSUME_NONNULL_BEGIN
 // 手势滑动触发此处代理
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController willTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController;
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController didTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController;
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollByDragging:(UIScrollView *)scrollView;
 // 调用 -showPageAtIndex:animated: 触发此处代理
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController willSwitchControllerFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController animated:(BOOL)animated;
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController didSwitchControllerFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController animated:(BOOL)animated;
-
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollBySwitching:(UIScrollView *)scrollView;
 @end
 
 @protocol MERPageViewControllerDataSource <NSObject>

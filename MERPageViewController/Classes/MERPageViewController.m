@@ -473,7 +473,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     // 滚动动画执行完成时的处理
     // 如果不采用动画形式，将直接调用该 block
     dispatch_block_t scrollAnimationCompleted = ^{
-        [self.queuingScrollView setContentOffset:[self calculateVisibleViewOffsetForIndex:currentPageIndex] animated:NO];
+        [self.queuingScrollView setContentOffset:[self calculateVisibleViewOffsetForIndex:currentPageIndex] animated:animated];
     };
 
     // 滚动执行结束的处理 block
@@ -564,13 +564,13 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             lastVC.view.frame = CGRectMake(lastViewAnimateToOrigin.x, lastViewAnimateToOrigin.y, pageSize.width, pageSize.height);
             currentVC.view.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
+            scrollAnimationCompleted();
         } completion:^(BOOL finished) {
             // 被打断的动画不执行以下操作
             BOOL completed = self->_animationKey == currentKey;
             if (completed) {
                 [self moveChildController:currentVC backToOriginPositionIfNeeded:currentPageIndex];
                 [self moveChildController:lastVC backToOriginPositionIfNeeded:lastSelectedIndex];
-                scrollAnimationCompleted();
                 scrollAfterAnimation();
             }
             !completion?:completion(completed);
@@ -756,9 +756,16 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 #pragma mark ----------------- UIScrollViewDelegate -----------------
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    
-    if (_isSwitchAnimating) return;
-    
+    if (_isSwitchAnimating) {
+        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:scrollViewDidScrollBySwitching:)]) {
+            [self.delegate mer_pageViewController:self scrollViewDidScrollBySwitching:scrollView];
+        }
+        return;
+    }
+    if ([self.delegate respondsToSelector:@selector(mer_pageViewController:scrollViewDidScrollByDragging:)]) {
+        [self.delegate mer_pageViewController:self scrollViewDidScrollByDragging:scrollView];
+    }
+
     CGFloat offsetX = scrollView.contentOffset.x;
     CGFloat widht = scrollView.frame.size.width;
     NSInteger lastGuessIndex = _guessToIndex < 0 ? _currentPageIndex : _guessToIndex;
