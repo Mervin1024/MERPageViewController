@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) UIEdgeInsets contentInsets;
 
-@property (nonatomic, readonly, assign) BOOL currentIndex;
+@property (nonatomic, readonly, assign) NSInteger currentIndex;
 @property (nullable, nonatomic, readonly, weak) UIViewController *currentViewController;
 
 /**

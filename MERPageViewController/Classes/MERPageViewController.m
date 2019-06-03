@@ -594,7 +594,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     return self.queuingScrollView.scrollEnabled;
 }
 
-- (BOOL)currentIndex {
+- (NSInteger)currentIndex {
     return _currentPageIndex;
 }
 

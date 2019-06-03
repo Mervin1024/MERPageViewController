@@ -5,11 +5,34 @@
 [![License](https://img.shields.io/cocoapods/l/MERPageViewController.svg?style=flat)](https://cocoapods.org/pods/MERPageViewController)
 [![Platform](https://img.shields.io/cocoapods/p/MERPageViewController.svg?style=flat)](https://cocoapods.org/pods/MERPageViewController)
 
+## Support
+
+Objective-C & iOS 8+.
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
-## Requirements
+```
+self.pageViewController = [[MERPageViewController alloc] init];
+self.pageViewController.dataSource = self;
+self.pageViewController.delegate = self;
+[self addChildViewController:self.pageViewController];
+[self.view addSubview:self.pageViewController.view];
+self.pageViewController.view.frame = [UIScreen mainScreen].bounds;
+```
+Required dataSource
+```
+#pragma mark ----------------- MERPageViewControllerDataSource -----------------
+
+- (nonnull UIViewController *)mer_pageViewController:(nonnull MERPageViewController *)pageViewController controllerAtIndex:(NSInteger)index {
+return [self.pageControllers objectAtIndex:index];
+}
+
+- (NSInteger)numberOfControllersInPageViewController:(nonnull MERPageViewController *)pageViewController {
+return self.pageControllers.count;
+}
+```
 
 ## Installation
 
@@ -22,7 +45,7 @@ pod 'MERPageViewController'
 
 ## Author
 
-Mervin1024, yaoma@sohu-inc.com
+Mervin1024, mervin1024@163.com
 
 ## License
 

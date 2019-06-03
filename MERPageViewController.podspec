@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MERPageViewController'
-  s.version          = '0.1.0'
-  s.summary          = 'A short description of MERPageViewController.'
+  s.version          = '1.0.2'
+  s.summary          = 'Custom horizontal scroll PageViewController. Support paging scroll and transition with animation.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,13 +18,13 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+                       'Because the UIPageViewController has some bugs in UIPageViewControllerTransitionStyleScroll & UIPageViewControllerNavigationOrientationHorizontal, so custom a horizontal scroll PageViewController.'
                        DESC
 
   s.homepage         = 'https://github.com/Mervin1024/MERPageViewController'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Mervin1024' => 'yaoma@sohu-inc.com' }
+  s.author           = { 'Mervin1024' => 'mervin1024@163.com' }
   s.source           = { :git => 'https://github.com/Mervin1024/MERPageViewController.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
