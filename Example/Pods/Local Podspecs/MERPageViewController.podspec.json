@@ -1,19 +1,19 @@
 {
   "name": "MERPageViewController",
-  "version": "0.1.0",
-  "summary": "A short description of MERPageViewController.",
-  "description": "TODO: Add long description of the pod here.",
+  "version": "1.0.3",
+  "summary": "Custom horizontal scroll PageViewController. Support paging scroll and transition with animation.",
+  "description": "'Because the UIPageViewController has some bugs in UIPageViewControllerTransitionStyleScroll & UIPageViewControllerNavigationOrientationHorizontal, so custom a horizontal scroll PageViewController.'",
   "homepage": "https://github.com/Mervin1024/MERPageViewController",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
   },
   "authors": {
-    "Mervin1024": "yaoma@sohu-inc.com"
+    "Mervin1024": "mervin1024@163.com"
   },
   "source": {
     "git": "https://github.com/Mervin1024/MERPageViewController.git",
-    "tag": "0.1.0"
+    "tag": "1.0.3"
   },
   "platforms": {
     "ios": "8.0"

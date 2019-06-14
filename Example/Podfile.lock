@@ -1,5 +1,5 @@
 PODS:
-  - MERPageViewController (0.1.0)
+  - MERPageViewController (1.0.3)
 
 DEPENDENCIES:
   - MERPageViewController (from `../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  MERPageViewController: 26a62f1f6cb2a02e8ef2131861df249731a042e0
+  MERPageViewController: e8dcf11ed69766e255aea71d8811d47feea98451
 
 PODFILE CHECKSUM: 55c5da43104bc5a78cc18aee2b87a6ed25733791
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.7.1

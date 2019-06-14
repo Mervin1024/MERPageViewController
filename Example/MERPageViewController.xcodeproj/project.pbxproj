@@ -309,7 +309,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-MERPageViewController_Example/Pods-MERPageViewController_Example-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-MERPageViewController_Example/Pods-MERPageViewController_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/MERPageViewController/MERPageViewController.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -318,7 +318,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MERPageViewController_Example/Pods-MERPageViewController_Example-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MERPageViewController_Example/Pods-MERPageViewController_Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		2DA72EB1948A3F3A31F98469 /* [CP] Check Pods Manifest.lock */ = {
