@@ -73,7 +73,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 @implementation _MERCache
 @dynamic delegate;
 - (void)setObject:(id)obj forKey:(id)key {
-    NSLog(@"[%@ - %@] key : %@", NSStringFromClass(self.class), NSStringFromSelector(_cmd), key);
     if ([obj isKindOfClass:UIViewController.class]) {
         [(UIViewController*)obj setMer_cacheKey:key];
     }
@@ -453,7 +452,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     // 滚动执行之前的处理
     dispatch_block_t scrollBeforeAnimation = ^{
         self->_isSwitchAnimating = YES;
-        self.queuingScrollView.userInteractionEnabled = NO;
+        self.queuingScrollView.panGestureRecognizer.enabled = NO;
         
         // 添加对应的 VC 到 scrollView 上，并通知代理
         [self pageViewControllerWillShowFromIndex:lastSelectedIndex toIndex:currentPageIndex animated:animated];
@@ -474,14 +473,14 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     // 滚动动画执行完成时的处理
     // 如果不采用动画形式，将直接调用该 block
     dispatch_block_t scrollAnimationCompleted = ^{
-        [self.queuingScrollView setContentOffset:[self calculateVisibleViewOffsetForIndex:currentPageIndex] animated:animated];
+        [self.queuingScrollView setContentOffset:[self calculateVisibleViewOffsetForIndex:currentPageIndex] animated:NO];
     };
 
     // 滚动执行结束的处理 block
     dispatch_block_t scrollAfterAnimation = ^{
         self->_isSwitchAnimating = NO;
-        self.queuingScrollView.userInteractionEnabled = YES;
-        
+        self.queuingScrollView.panGestureRecognizer.enabled = YES;
+
         [[self controllerAtIndex:currentPageIndex] endAppearanceTransition];
         if (currentPageIndex != lastSelectedIndex) {
             [[self controllerAtIndex:lastSelectedIndex] endAppearanceTransition];
@@ -565,8 +564,8 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             lastVC.view.frame = CGRectMake(lastViewAnimateToOrigin.x, lastViewAnimateToOrigin.y, pageSize.width, pageSize.height);
             currentVC.view.frame = CGRectMake(currentViewAnimateToOrigin.x, currentViewAnimateToOrigin.y, pageSize.width, pageSize.height);;
-            scrollAnimationCompleted();
         } completion:^(BOOL finished) {
+            scrollAnimationCompleted();
             // 被打断的动画不执行以下操作
             BOOL completed = self->_animationKey == currentKey;
             if (completed) {
@@ -674,7 +673,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     
     CGRect childViewFrame = [self calculateVisibleViewControllerFrameForIndex:index];
     [self mer_addChildViewController:vc inView:self.queuingScrollView frame:childViewFrame];
-    NSLog(@"[%@ - %@] index : %@", NSStringFromClass(self.class), NSStringFromSelector(_cmd), @(index));
     [self.merCache setObject:vc forKey:@(index)];
 }
 
@@ -684,7 +682,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     // 不要把当前页面移出
     if ([self.childWillRemove containsObject:currentVC]) {
         [self.childWillRemove removeObject:currentVC];
-        NSLog(@"[%@ - %@] currentPageIndex : %@", NSStringFromClass(self.class), NSStringFromSelector(_cmd), @(_currentPageIndex));
         [self.merCache setObject:currentVC forKey:@(_currentPageIndex)];
     }
     
@@ -868,7 +865,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     UIViewController *vc = (UIViewController *)obj;
     NSNumber *cacheKey = vc.mer_cacheKey;
     NSInteger index = cacheKey?cacheKey.integerValue:NSNotFound;
-    NSLog(@"[%@ - %@] cacheKey : %@", NSStringFromClass(self.class), NSStringFromSelector(_cmd), cacheKey);
 
     // 当 queuingScrollView 处于 isDragging 状态，Tracking 和 Decelerating 状态都是 NO。
     // 判断全部为 NO ，代表着缓存清除不是由连续的页面交互触发的
@@ -900,14 +896,12 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 }
 
 - (void)cacheDidEnterBackground:(MERPageLRUCache *)cache {
-    NSLog(@"[%@ - %@]", NSStringFromClass(self.class), NSStringFromSelector(_cmd));
     dispatch_async(dispatch_get_main_queue(), ^{
         [self removeOtherChildVC];
     });
 }
 
 - (void)cacheDidReceiveMemoryWarning:(MERPageLRUCache *)cache {
-    NSLog(@"[%@ - %@]", NSStringFromClass(self.class), NSStringFromSelector(_cmd));
     dispatch_async(dispatch_get_main_queue(), ^{
         [self removeOtherChildVC];
     });
