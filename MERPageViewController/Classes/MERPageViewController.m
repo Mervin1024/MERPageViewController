@@ -6,6 +6,7 @@
 //
 
 #import "MERPageViewController.h"
+#import "MERPageLRUCache.h"
 #import <objc/runtime.h>
 
 typedef NS_ENUM(NSUInteger, MERPageScrollDirection) {
@@ -65,13 +66,14 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 
 @end
 
-@interface _MERCache <KeyType, ObjectType> : NSCache
+@interface _MERCache <KeyType, ObjectType> : MERPageLRUCache
 
 @end
 
 @implementation _MERCache
-
+@dynamic delegate;
 - (void)setObject:(id)obj forKey:(id)key {
+    NSLog(@"[%@ - %@] key : %@", NSStringFromClass(self.class), NSStringFromSelector(_cmd), key);
     if ([obj isKindOfClass:UIViewController.class]) {
         [(UIViewController*)obj setMer_cacheKey:key];
     }
@@ -88,7 +90,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 
 @end
 
-@interface MERPageViewController () <NSCacheDelegate, UIScrollViewDelegate>
+@interface MERPageViewController () <MERPageLRUCacheDelegate, UIScrollViewDelegate>
 {
     // 用于计算的属性值
     NSInteger _currentPageIndex;
@@ -177,6 +179,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     _firstDidAppear = YES;
     _firstDidLayoutSubViews = YES;
     _firstWillLayoutSubViews = YES;
+    _isSwitchAnimating = NO;
 }
 
 #pragma mark ----------------- View lifecycle -----------------
@@ -267,7 +270,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    [self.merCache removeAllObjects];
 }
 
 - (BOOL)shouldAutomaticallyForwardAppearanceMethods {
@@ -413,7 +415,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     }
 
     [self.merCache removeAllObjects];
-    [self.merCache setObject:currentVC forKey:@(_currentPageIndex)];
 
     [self.childWillRemove enumerateObjectsUsingBlock:^(UIViewController * _Nonnull obj, BOOL * _Nonnull stop) {
         [obj mer_removeFromParentViewController];
@@ -673,6 +674,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     
     CGRect childViewFrame = [self calculateVisibleViewControllerFrameForIndex:index];
     [self mer_addChildViewController:vc inView:self.queuingScrollView frame:childViewFrame];
+    NSLog(@"[%@ - %@] index : %@", NSStringFromClass(self.class), NSStringFromSelector(_cmd), @(index));
     [self.merCache setObject:vc forKey:@(index)];
 }
 
@@ -682,6 +684,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     // 不要把当前页面移出
     if ([self.childWillRemove containsObject:currentVC]) {
         [self.childWillRemove removeObject:currentVC];
+        NSLog(@"[%@ - %@] currentPageIndex : %@", NSStringFromClass(self.class), NSStringFromSelector(_cmd), @(_currentPageIndex));
         [self.merCache setObject:currentVC forKey:@(_currentPageIndex)];
     }
     
@@ -856,15 +859,17 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     
 }
 
-#pragma mark ----------------- NSCacheDelegate -----------------
+#pragma mark ----------------- MERPageLRUCacheDelegate -----------------
 
-- (void)cache:(NSCache *)cache willEvictObject:(id)obj {
+- (void)cache:(MERPageLRUCache *)cache willEvictObject:(id)obj {
     if (![obj isKindOfClass:UIViewController.class]) return;
     if (![self.childViewControllers containsObject:obj]) return;
     
     UIViewController *vc = (UIViewController *)obj;
     NSNumber *cacheKey = vc.mer_cacheKey;
     NSInteger index = cacheKey?cacheKey.integerValue:NSNotFound;
+    NSLog(@"[%@ - %@] cacheKey : %@", NSStringFromClass(self.class), NSStringFromSelector(_cmd), cacheKey);
+
     // 当 queuingScrollView 处于 isDragging 状态，Tracking 和 Decelerating 状态都是 NO。
     // 判断全部为 NO ，代表着缓存清除不是由连续的页面交互触发的
     if (!self.queuingScrollView.isDragging &&
@@ -892,6 +897,20 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     if ([self.childWillRemove containsObject:vc]) return;
 
     [vc mer_removeFromParentViewController];
+}
+
+- (void)cacheDidEnterBackground:(MERPageLRUCache *)cache {
+    NSLog(@"[%@ - %@]", NSStringFromClass(self.class), NSStringFromSelector(_cmd));
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self removeOtherChildVC];
+    });
+}
+
+- (void)cacheDidReceiveMemoryWarning:(MERPageLRUCache *)cache {
+    NSLog(@"[%@ - %@]", NSStringFromClass(self.class), NSStringFromSelector(_cmd));
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self removeOtherChildVC];
+    });
 }
 
 #pragma mark ----------------- Subclass Override -----------------

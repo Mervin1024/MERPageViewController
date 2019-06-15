@@ -110,11 +110,11 @@
 }
 
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollByDragging:(UIScrollView *)scrollView {
-    NSLog(@"scrollViewDidScrollByDragging ： %@", @(scrollView.contentOffset.x));
+//    NSLog(@"scrollViewDidScrollByDragging ： %@", @(scrollView.contentOffset.x));
 }
 
 - (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollBySwitching:(UIScrollView *)scrollView {
-    NSLog(@"scrollViewDidScrollBySwitching ： %@", @(scrollView.contentOffset.x));
+//    NSLog(@"scrollViewDidScrollBySwitching ： %@", @(scrollView.contentOffset.x));
 }
 
 @end

@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "MERPageLRUCache.h"
 #import "MERPageViewController.h"
 
 FOUNDATION_EXPORT double MERPageViewControllerVersionNumber;
