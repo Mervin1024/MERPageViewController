@@ -14,7 +14,6 @@
     __unsafe_unretained _MERLinkedMapNode *_next; // retained by dic
     id _key;
     id _value;
-    NSUInteger _cost;
     NSTimeInterval _time;
 }
 @end
@@ -26,7 +25,6 @@
 @interface _MERLinkedMap : NSObject {
     @package
     CFMutableDictionaryRef _dic; // do not set object directly
-    NSUInteger _totalCost;
     NSUInteger _totalCount;
     _MERLinkedMapNode *_head; // MRU, do not change it directly
     _MERLinkedMapNode *_tail; // LRU, do not change it directly
@@ -61,7 +59,6 @@ static void _MERLinkedMapApplyFunction (const void* key, const void* value, void
 
 - (void)insertNodeAtHead:(_MERLinkedMapNode *)node {
     CFDictionarySetValue(_dic, (__bridge const void *)(node->_key), (__bridge const void *)(node));
-    _totalCost += node->_cost;
     _totalCount++;
     if (_head) {
         node->_next = _head;
@@ -90,7 +87,6 @@ static void _MERLinkedMapApplyFunction (const void* key, const void* value, void
 
 - (void)removeNode:(_MERLinkedMapNode *)node {
     CFDictionaryRemoveValue(_dic, (__bridge const void *)(node->_key));
-    _totalCost -= node->_cost;
     _totalCount--;
     if (node->_next) node->_next->_prev = node->_prev;
     if (node->_prev) node->_prev->_next = node->_next;
@@ -104,7 +100,6 @@ static void _MERLinkedMapApplyFunction (const void* key, const void* value, void
     if (!_tail) return nil;
     _MERLinkedMapNode *tail = _tail;
     CFDictionaryRemoveValue(_dic, (__bridge const void *)(_tail->_key));
-    _totalCost -= _tail->_cost;
     _totalCount--;
     if (_head == _tail) {
         _head = _tail = nil;
@@ -117,7 +112,6 @@ static void _MERLinkedMapApplyFunction (const void* key, const void* value, void
 }
 
 - (void)removeAll {
-    _totalCost = 0;
     _totalCount = 0;
     _head = nil;
     _tail = nil;
@@ -234,7 +228,7 @@ static void _MERLinkedMapApplyFunction (const void* key, const void* value, void
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_appDidReceiveMemoryWarningNotification) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_appDidEnterBackgroundNotification) name:UIApplicationDidEnterBackgroundNotification object:nil];
-
+    
     [self _trimRecursively];
     return self;
 }
@@ -283,7 +277,6 @@ static void _MERLinkedMapApplyFunction (const void* key, const void* value, void
     _MERLinkedMapNode *node = CFDictionaryGetValue(_lru->_dic, (__bridge const void *)(key));
     NSTimeInterval now = CACurrentMediaTime();
     if (node) {
-        _lru->_totalCost -= node->_cost;
         node->_time = now;
         node->_value = object;
         [_lru bringNodeToHead:node];
