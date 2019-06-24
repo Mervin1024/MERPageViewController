@@ -286,6 +286,11 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     self.queuingScrollView.backgroundColor = [UIColor clearColor];
     self.queuingScrollView.scrollsToTop = NO;
     
+    if (@available(iOS 11.0, *)) {
+        // 安全区某些复杂页面层级下会导致子页面布局出问题，此处禁用
+        self.queuingScrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    }
+
     [self.view addSubview:self.queuingScrollView];
     // AutoLayout
     NSMutableArray<NSLayoutConstraint*> *constraints = [NSMutableArray arrayWithCapacity:4];
