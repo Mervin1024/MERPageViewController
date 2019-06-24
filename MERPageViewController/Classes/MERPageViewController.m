@@ -316,21 +316,21 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         [NSLayoutConstraint constraintWithItem:self.queuingScrollView
                                      attribute:NSLayoutAttributeTop
                                      relatedBy:NSLayoutRelationEqual
-                                        toItem:self.topLayoutGuide
-                                     attribute:NSLayoutAttributeBottom
+                                        toItem:self.view
+                                     attribute:NSLayoutAttributeTop
                                     multiplier:1
-                                      constant:self.contentInsets.top];
+                                      constant:-self.contentInsets.top];
     })];
     [constraints addObject:({
         [NSLayoutConstraint constraintWithItem:self.queuingScrollView
                                      attribute:NSLayoutAttributeBottom
                                      relatedBy:NSLayoutRelationEqual
-                                        toItem:self.bottomLayoutGuide
-                                     attribute:NSLayoutAttributeTop
+                                        toItem:self.view
+                                     attribute:NSLayoutAttributeBottom
                                     multiplier:1
-                                      constant:self.contentInsets.bottom];
+                                      constant:-self.contentInsets.bottom];
     })];
-    
+
     [self.view addConstraints:constraints];
     self.queuingScrollViewConstraints = constraints;
 }
