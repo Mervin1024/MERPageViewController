@@ -44,6 +44,7 @@
     
     
     UIButton *touchButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    touchButton.titleLabel.font = [UIFont systemFontOfSize:30];
     [touchButton setTitle:@"随机跳转" forState:UIControlStateNormal];
     [touchButton sizeToFit];
     [self.view addSubview:touchButton];
@@ -51,6 +52,7 @@
     [touchButton addTarget:self action:@selector(touchButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     UIButton *reloadButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    reloadButton.titleLabel.font = [UIFont systemFontOfSize:30];
     [reloadButton setTitle:@"刷新数据" forState:UIControlStateNormal];
     [reloadButton sizeToFit];
     [self.view addSubview:reloadButton];
