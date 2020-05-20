@@ -163,6 +163,10 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     self = [super init];
     if (self) {
         [self initVariables];
+        _firstWillAppear = YES;
+        _firstDidAppear = YES;
+        _firstDidLayoutSubViews = YES;
+        _firstWillLayoutSubViews = YES;
     }
     return self;
 }
@@ -174,10 +178,6 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     _originOffset = 0.0f;
     _guessToIndex = -1;
     _lastSelectedIndex = 0;
-    _firstWillAppear = YES;
-    _firstDidAppear = YES;
-    _firstDidLayoutSubViews = YES;
-    _firstWillLayoutSubViews = YES;
     _isSwitchAnimating = NO;
 }
 
@@ -197,12 +197,13 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     UIViewController *currentVC = [self controllerAtIndex:_currentPageIndex];
     if (_firstWillAppear) {
         _firstWillAppear = NO;
-        [self pageViewControllerWillShowFromIndex:_lastSelectedIndex toIndex:_currentPageIndex animated:NO];
-        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:willSwitchControllerFrom:toViewController:animated:)]) {
+        [self pageViewControllerWillTransitionFromIndex:_lastSelectedIndex toIndex:_currentPageIndex transitionType:MERTransitionTypeSwitch animated:NO];
+        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:willTransitionFrom:toViewController:transitionType:animated:)]) {
             UIViewController *lastVC = _lastSelectedIndex==_currentPageIndex ? currentVC : [self controllerAtIndex:_lastSelectedIndex];
             [self.delegate mer_pageViewController:self
-                         willSwitchControllerFrom:lastVC
+                               willTransitionFrom:lastVC
                                  toViewController:currentVC
+                                   transitionType:MERTransitionTypeSwitch
                                          animated:NO];
         }
     }
@@ -245,12 +246,13 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     UIViewController *currentVC = [self controllerAtIndex:_currentPageIndex];
     if (_firstDidAppear) {
         _firstDidAppear = NO;
-        [self pageViewControllerDidShowFromIndex:_lastSelectedIndex toIndex:_currentPageIndex animated:NO];
-        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:didSwitchControllerFrom:toViewController:animated:)]) {
+        [self pageViewControllerDidTransitionFromIndex:_lastSelectedIndex toIndex:_currentPageIndex transitionType:MERTransitionTypeSwitch animated:NO];
+        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:didTransitionFrom:toViewController:transitionType:animated:)]) {
             UIViewController *lastVC = _lastSelectedIndex==_currentPageIndex ? currentVC : [self controllerAtIndex:_lastSelectedIndex];
             [self.delegate mer_pageViewController:self
-                          didSwitchControllerFrom:lastVC
+                                didTransitionFrom:lastVC
                                  toViewController:currentVC
+                                   transitionType:MERTransitionTypeSwitch
                                          animated:NO];
         }
     }
@@ -287,7 +289,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     self.queuingScrollView.scrollsToTop = NO;
     
     if (@available(iOS 11.0, *)) {
-        // 安全区某些复杂页面层级下会导致子页面布局出问题，此处禁用
+        // 受安全区影响，在某些复杂页面层级下会导致子页面布局出问题，此处禁用
         self.queuingScrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     }
 
@@ -404,6 +406,17 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 #pragma mark ----------------- Public -----------------
 
 - (void)reloadData {
+    if (self.pageCount == 0) {
+        [self initVariables];
+        [self.merCache removeAllObjects];
+        [self.childWillRemove enumerateObjectsUsingBlock:^(UIViewController * _Nonnull obj, BOOL * _Nonnull stop) {
+            [obj mer_removeFromParentViewController];
+        }];
+        [self.childWillRemove removeAllObjects];
+        [self updateScrollViewLayoutIfNeeded];
+        [self updateScrollViewDisplayIndexIfNeeded];
+        return;
+    }
     _currentPageIndex = MIN(_currentPageIndex, self.pageCount-1);
     UIViewController *currentVC = ({
         UIViewController *vc = nil;
@@ -460,11 +473,12 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         self.queuingScrollView.panGestureRecognizer.enabled = NO;
         
         // 添加对应的 VC 到 scrollView 上，并通知代理
-        [self pageViewControllerWillShowFromIndex:lastSelectedIndex toIndex:currentPageIndex animated:animated];
-        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:willSwitchControllerFrom:toViewController:animated:)]) {
+        [self pageViewControllerWillTransitionFromIndex:lastSelectedIndex toIndex:currentPageIndex transitionType:MERTransitionTypeSwitch animated:animated];
+        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:willTransitionFrom:toViewController:transitionType:animated:)]) {
             [self.delegate mer_pageViewController:self
-                         willSwitchControllerFrom:[self controllerAtIndex:lastSelectedIndex]
+                               willTransitionFrom:[self controllerAtIndex:lastSelectedIndex]
                                  toViewController:[self controllerAtIndex:currentPageIndex]
+                                   transitionType:MERTransitionTypeSwitch
                                          animated:animated];
         }
         [self addVisibleViewContorllerForIndex:index];
@@ -492,11 +506,12 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
         }
         
         // 通知结束代理，并清掉不显示的 VC
-        [self pageViewControllerDidShowFromIndex:lastSelectedIndex toIndex:currentPageIndex animated:animated];
-        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:didSwitchControllerFrom:toViewController:animated:)]) {
+        [self pageViewControllerDidTransitionFromIndex:lastSelectedIndex toIndex:currentPageIndex transitionType:MERTransitionTypeSwitch animated:animated];
+        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:didTransitionFrom:toViewController:transitionType:animated:)]) {
             [self.delegate mer_pageViewController:self
-                          didSwitchControllerFrom:[self controllerAtIndex:lastSelectedIndex]
+                                didTransitionFrom:[self controllerAtIndex:lastSelectedIndex]
                                  toViewController:[self controllerAtIndex:currentPageIndex]
+                                   transitionType:MERTransitionTypeSwitch
                                          animated:animated];
         }
         [self removeOtherChildVC];
@@ -750,9 +765,13 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     _originOffset = scrollView.contentOffset.x;
     _guessToIndex = _currentPageIndex;
     
-    [self pageViewControllerDidTransitionFromIndex:oldIndex toIndex:newIndex];
-    if ([self.delegate respondsToSelector:@selector(mer_pageViewController:didTransitionFrom:toViewController:)]) {
-        [self.delegate mer_pageViewController:self didTransitionFrom:oldIndexVC toViewController:newIndexVC];
+    [self pageViewControllerDidTransitionFromIndex:oldIndex toIndex:newIndex transitionType:MERTransitionTypeDragging animated:YES];
+    if ([self.delegate respondsToSelector:@selector(mer_pageViewController:didTransitionFrom:toViewController:transitionType:animated:)]) {
+        [self.delegate mer_pageViewController:self
+                            didTransitionFrom:oldIndexVC
+                             toViewController:newIndexVC
+                               transitionType:MERTransitionTypeDragging
+                                     animated:YES];
     }
     
     [self removeOtherChildVC];
@@ -762,13 +781,13 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (_isSwitchAnimating) {
-        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:scrollViewDidScrollBySwitching:)]) {
-            [self.delegate mer_pageViewController:self scrollViewDidScrollBySwitching:scrollView];
+        if ([self.delegate respondsToSelector:@selector(mer_pageViewController:scrollViewDidScroll:transitionType:)]) {
+            [self.delegate mer_pageViewController:self scrollViewDidScroll:scrollView transitionType:MERTransitionTypeSwitch];
         }
         return;
     }
-    if ([self.delegate respondsToSelector:@selector(mer_pageViewController:scrollViewDidScrollByDragging:)]) {
-        [self.delegate mer_pageViewController:self scrollViewDidScrollByDragging:scrollView];
+    if ([self.delegate respondsToSelector:@selector(mer_pageViewController:scrollViewDidScroll:transitionType:)]) {
+        [self.delegate mer_pageViewController:self scrollViewDidScroll:scrollView transitionType:MERTransitionTypeDragging];
     }
 
     CGFloat offsetX = scrollView.contentOffset.x;
@@ -800,11 +819,13 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
     UIViewController *guessToIndexVC = [self controllerAtIndex:_guessToIndex];
     UIViewController *currentIndexVC = [self controllerAtIndex:_currentPageIndex];
 
-    [self pageViewControllerWillTransitionFromIndex:_currentPageIndex toIndex:_guessToIndex];
-    if ([self.delegate respondsToSelector:@selector(mer_pageViewController:willTransitionFrom:toViewController:)]) {
+    [self pageViewControllerWillTransitionFromIndex:_currentPageIndex toIndex:_guessToIndex transitionType:MERTransitionTypeDragging animated:YES];
+    if ([self.delegate respondsToSelector:@selector(mer_pageViewController:willTransitionFrom:toViewController:transitionType:animated:)]) {
         [self.delegate mer_pageViewController:self
                            willTransitionFrom:currentIndexVC
-                             toViewController:guessToIndexVC];
+                             toViewController:guessToIndexVC
+                               transitionType:MERTransitionTypeDragging
+                                     animated:YES];
     }
     [self addVisibleViewContorllerForIndex:_guessToIndex];
     
@@ -914,10 +935,7 @@ static void *kMERUIViewControllerCacheKey = &kMERUIViewControllerCacheKey;
 
 #pragma mark ----------------- Subclass Override -----------------
 
-- (void)pageViewControllerWillTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex {}
-- (void)pageViewControllerDidTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex {}
-- (void)pageViewControllerWillShowFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex animated:(BOOL)animated{}
-- (void)pageViewControllerDidShowFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex animated:(BOOL)animated{}
-
+- (void)pageViewControllerWillTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex transitionType:(MERTransitionType)transitionType animated:(BOOL)animated {}
+- (void)pageViewControllerDidTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex transitionType:(MERTransitionType)transitionType animated:(BOOL)animated {}
 
 @end

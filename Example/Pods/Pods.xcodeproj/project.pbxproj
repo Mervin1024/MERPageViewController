@@ -7,30 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0BE81F724CF145A9CE86C13FF5B61B15 /* MERPageViewController-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 76E184D35F151D12659C2F3F065EF419 /* MERPageViewController-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		46ED906E17CBE083509A23524CA9D53C /* Pods-MERPageViewController_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 233BDCBDCB38D06B4A86A952F31EFE6A /* Pods-MERPageViewController_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5D9157076ED5E6306CBD4D65F135B1C9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
-		658E64A5833588BE979463D5D11699B9 /* MERPageLRUCache.h in Headers */ = {isa = PBXBuildFile; fileRef = E5AD2FB8A6B2F2C1F43DE7210E5792CC /* MERPageLRUCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7D4A76A2F8F96CF302BAD2F2A1C45688 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
-		9DB99AA7415CF26E943434D02A602D54 /* MERPageViewController-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E791A1E2938514A06484EE82C968E941 /* MERPageViewController-dummy.m */; };
-		C29F1047EABFB6A18EA0922D0026480B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
-		CD873E3E34B28F952802BF2749D22BAB /* Pods-MERPageViewController_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 779D6146E05C553DA1A598B46B0AF93E /* Pods-MERPageViewController_Example-dummy.m */; };
-		D451C24C11E4721FD794B7C30604384D /* Pods-MERPageViewController_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = ACED2AC74BFD495049849DC1621262BF /* Pods-MERPageViewController_Tests-dummy.m */; };
-		D544AE334C4AF4CBE3E256E7A9ED5B53 /* Pods-MERPageViewController_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = E755E909FCE57DB57C0B33A3FB1AB17E /* Pods-MERPageViewController_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D5873092D52B09EEA7AAEC2AA7552F5B /* MERPageLRUCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 50254C2B3B064A79067FBE3E975F561E /* MERPageLRUCache.m */; };
-		D7A26EB0190182AEF42094908EE4164F /* MERPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 259FE7826EDAFEB998CD791308D18F04 /* MERPageViewController.m */; };
-		E1CF5794112E5692A0B12DA06BF009A2 /* MERPageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = AC08813DCBB90FDFFF870DE82011016A /* MERPageViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		02EABE20F16BC49B1B6FD393E66B8F94 /* MERPageViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = AC08813DCBB90FDFFF870DE82011016A /* MERPageViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1D211BA599DED3BC9551ACF54D0E4256 /* MERPageLRUCache.h in Headers */ = {isa = PBXBuildFile; fileRef = E5AD2FB8A6B2F2C1F43DE7210E5792CC /* MERPageLRUCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60DCC461484EBDBFEC25D06AD88A4638 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
+		6D9FBAB97854F8F6687D38515CC59C4B /* MERPageLRUCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 50254C2B3B064A79067FBE3E975F561E /* MERPageLRUCache.m */; };
+		7DB2652A2B8A418507532287F967051D /* Pods-MERPageViewController_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 233BDCBDCB38D06B4A86A952F31EFE6A /* Pods-MERPageViewController_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8197632CC58C6992E999F8DB49B6E9D6 /* MERPageViewController-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E791A1E2938514A06484EE82C968E941 /* MERPageViewController-dummy.m */; };
+		997BA790AAB4FF780F4633717C8974B1 /* Pods-MERPageViewController_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = ACED2AC74BFD495049849DC1621262BF /* Pods-MERPageViewController_Tests-dummy.m */; };
+		B9316ABEF6399145654EB76CF63B80B0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
+		BEBE3D7090EA0271EF30FB1D1E16557D /* Pods-MERPageViewController_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 779D6146E05C553DA1A598B46B0AF93E /* Pods-MERPageViewController_Example-dummy.m */; };
+		D7187C39F1F5010FD3E984D844D4C8EB /* MERPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 259FE7826EDAFEB998CD791308D18F04 /* MERPageViewController.m */; };
+		E466B6840368572AF0308553E799AD6E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3212113385A8FBBDB272BD23C409FF61 /* Foundation.framework */; };
+		E864A8A7C53F28508B3728FFCDD74EB0 /* Pods-MERPageViewController_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = E755E909FCE57DB57C0B33A3FB1AB17E /* Pods-MERPageViewController_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		F3656AAC8B25286DF3E508072F6BB56F /* MERPageViewController-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 76E184D35F151D12659C2F3F065EF419 /* MERPageViewController-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		1FFB4F74381D5E08FEF10AAE8B3DBE12 /* PBXContainerItemProxy */ = {
+		391A881E7D4829BEA99119EFEF641531 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = C6D54BF69FBAB7AEF44B1602FFD1A3E1;
 			remoteInfo = "Pods-MERPageViewController_Example";
 		};
-		FEE2DA9BE0E3CB6AFDD9FC333CE968CF /* PBXContainerItemProxy */ = {
+		3CA2EC0740CA4E74F33B365777CC6063 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
 			proxyType = 1;
@@ -78,27 +78,27 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		43C56ACD6C2B16832E418AAD87A688C3 /* Frameworks */ = {
+		5DB34A7E884FB082F5190882CD89E9E0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7D4A76A2F8F96CF302BAD2F2A1C45688 /* Foundation.framework in Frameworks */,
+				B9316ABEF6399145654EB76CF63B80B0 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		6120BF68A910793BCBAE8DFA3D842E28 /* Frameworks */ = {
+		E3BB24D58C2A37B068624FAAB337D8FB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5D9157076ED5E6306CBD4D65F135B1C9 /* Foundation.framework in Frameworks */,
+				60DCC461484EBDBFEC25D06AD88A4638 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A91058431B483480589B51C10A379928 /* Frameworks */ = {
+		ECC61E273BBBAFEA22D8D9DD655CCF60 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C29F1047EABFB6A18EA0922D0026480B /* Foundation.framework in Frameworks */,
+				E466B6840368572AF0308553E799AD6E /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,29 +233,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		BCB70C4E9082B6728C5C6C1D592B227B /* Headers */ = {
+		100358BD4BCBCF0370685136E84D4D8B /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				658E64A5833588BE979463D5D11699B9 /* MERPageLRUCache.h in Headers */,
-				0BE81F724CF145A9CE86C13FF5B61B15 /* MERPageViewController-umbrella.h in Headers */,
-				E1CF5794112E5692A0B12DA06BF009A2 /* MERPageViewController.h in Headers */,
+				1D211BA599DED3BC9551ACF54D0E4256 /* MERPageLRUCache.h in Headers */,
+				F3656AAC8B25286DF3E508072F6BB56F /* MERPageViewController-umbrella.h in Headers */,
+				02EABE20F16BC49B1B6FD393E66B8F94 /* MERPageViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C7C0F86E2C9275D99456F0152A3C6BB5 /* Headers */ = {
+		2CA588212347FBD45F414FCF70AFD5F3 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D544AE334C4AF4CBE3E256E7A9ED5B53 /* Pods-MERPageViewController_Example-umbrella.h in Headers */,
+				7DB2652A2B8A418507532287F967051D /* Pods-MERPageViewController_Tests-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DE0EB041C955F4D0140776296EBE234A /* Headers */ = {
+		60A20E2866356F3570ED99016DE40B66 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				46ED906E17CBE083509A23524CA9D53C /* Pods-MERPageViewController_Tests-umbrella.h in Headers */,
+				E864A8A7C53F28508B3728FFCDD74EB0 /* Pods-MERPageViewController_Example-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,12 +264,12 @@
 /* Begin PBXNativeTarget section */
 		A5976B3F90C05BB092130BA8BF447B71 /* MERPageViewController */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 03C85545BD59F4523C644B7F8CA74464 /* Build configuration list for PBXNativeTarget "MERPageViewController" */;
+			buildConfigurationList = 74D6B7BBC05EFD63A5545BB669B337C7 /* Build configuration list for PBXNativeTarget "MERPageViewController" */;
 			buildPhases = (
-				BCB70C4E9082B6728C5C6C1D592B227B /* Headers */,
-				7614926081E2F0685DCD3FA85265470D /* Sources */,
-				6120BF68A910793BCBAE8DFA3D842E28 /* Frameworks */,
-				7D806660A99E116868E4E4A436CF5E6C /* Resources */,
+				100358BD4BCBCF0370685136E84D4D8B /* Headers */,
+				3637186F1C581F5F78DFE30752C59CDE /* Sources */,
+				E3BB24D58C2A37B068624FAAB337D8FB /* Frameworks */,
+				08FA037238E587A8895AADC50B9FDD98 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -282,17 +282,17 @@
 		};
 		AA7DFA96C14883AA7D9F014AC106FC98 /* Pods-MERPageViewController_Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 26F746D8DBB5487C9C998B8020979665 /* Build configuration list for PBXNativeTarget "Pods-MERPageViewController_Tests" */;
+			buildConfigurationList = 7928662EE1FA706BD977AEFD3B1DCA09 /* Build configuration list for PBXNativeTarget "Pods-MERPageViewController_Tests" */;
 			buildPhases = (
-				DE0EB041C955F4D0140776296EBE234A /* Headers */,
-				CFAE6B1183B39E279A530B51C81C8336 /* Sources */,
-				43C56ACD6C2B16832E418AAD87A688C3 /* Frameworks */,
-				8D74516DF6CF0EDEE8BF9AF6726FA908 /* Resources */,
+				2CA588212347FBD45F414FCF70AFD5F3 /* Headers */,
+				B4E71917CCF9D37369D97A82C1963D41 /* Sources */,
+				ECC61E273BBBAFEA22D8D9DD655CCF60 /* Frameworks */,
+				48132122D58A2E5C230CB28257A45BDB /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				A6507E0C8FDAC3BC93214A8F2808603F /* PBXTargetDependency */,
+				058507E4283AADF5EC748C75A6FE405E /* PBXTargetDependency */,
 			);
 			name = "Pods-MERPageViewController_Tests";
 			productName = "Pods-MERPageViewController_Tests";
@@ -301,17 +301,17 @@
 		};
 		C6D54BF69FBAB7AEF44B1602FFD1A3E1 /* Pods-MERPageViewController_Example */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 84AE8BA40740613F1819176D16250A02 /* Build configuration list for PBXNativeTarget "Pods-MERPageViewController_Example" */;
+			buildConfigurationList = 8031D0B6CC1B5BD841F033B1EAE03641 /* Build configuration list for PBXNativeTarget "Pods-MERPageViewController_Example" */;
 			buildPhases = (
-				C7C0F86E2C9275D99456F0152A3C6BB5 /* Headers */,
-				4B513898C411BF003C364BD91B5C9CBB /* Sources */,
-				A91058431B483480589B51C10A379928 /* Frameworks */,
-				B113CD26D021095AA617CDA9CD235F57 /* Resources */,
+				60A20E2866356F3570ED99016DE40B66 /* Headers */,
+				EB9FC6CB8215A091039FDF5856207788 /* Sources */,
+				5DB34A7E884FB082F5190882CD89E9E0 /* Frameworks */,
+				B4C8EC8AD5345A2C8B49810065ACBA8E /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				D1214E4F0A31749A55BB1B3DABCD6684 /* PBXTargetDependency */,
+				44CC30EC8A028AD19A1F85DF157AABF6 /* PBXTargetDependency */,
 			);
 			name = "Pods-MERPageViewController_Example";
 			productName = "Pods-MERPageViewController_Example";
@@ -324,8 +324,8 @@
 		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1020;
-				LastUpgradeCheck = 1020;
+				LastSwiftUpdateCheck = 1100;
+				LastUpgradeCheck = 1100;
 			};
 			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -333,6 +333,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
 			productRefGroup = 789F4F60CA8CE531F31FA327AC423C22 /* Products */;
@@ -347,21 +348,21 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		7D806660A99E116868E4E4A436CF5E6C /* Resources */ = {
+		08FA037238E587A8895AADC50B9FDD98 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8D74516DF6CF0EDEE8BF9AF6726FA908 /* Resources */ = {
+		48132122D58A2E5C230CB28257A45BDB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B113CD26D021095AA617CDA9CD235F57 /* Resources */ = {
+		B4C8EC8AD5345A2C8B49810065ACBA8E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -371,147 +372,50 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		4B513898C411BF003C364BD91B5C9CBB /* Sources */ = {
+		3637186F1C581F5F78DFE30752C59CDE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CD873E3E34B28F952802BF2749D22BAB /* Pods-MERPageViewController_Example-dummy.m in Sources */,
+				6D9FBAB97854F8F6687D38515CC59C4B /* MERPageLRUCache.m in Sources */,
+				8197632CC58C6992E999F8DB49B6E9D6 /* MERPageViewController-dummy.m in Sources */,
+				D7187C39F1F5010FD3E984D844D4C8EB /* MERPageViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7614926081E2F0685DCD3FA85265470D /* Sources */ = {
+		B4E71917CCF9D37369D97A82C1963D41 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D5873092D52B09EEA7AAEC2AA7552F5B /* MERPageLRUCache.m in Sources */,
-				9DB99AA7415CF26E943434D02A602D54 /* MERPageViewController-dummy.m in Sources */,
-				D7A26EB0190182AEF42094908EE4164F /* MERPageViewController.m in Sources */,
+				997BA790AAB4FF780F4633717C8974B1 /* Pods-MERPageViewController_Tests-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CFAE6B1183B39E279A530B51C81C8336 /* Sources */ = {
+		EB9FC6CB8215A091039FDF5856207788 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D451C24C11E4721FD794B7C30604384D /* Pods-MERPageViewController_Tests-dummy.m in Sources */,
+				BEBE3D7090EA0271EF30FB1D1E16557D /* Pods-MERPageViewController_Example-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A6507E0C8FDAC3BC93214A8F2808603F /* PBXTargetDependency */ = {
+		058507E4283AADF5EC748C75A6FE405E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "Pods-MERPageViewController_Example";
 			target = C6D54BF69FBAB7AEF44B1602FFD1A3E1 /* Pods-MERPageViewController_Example */;
-			targetProxy = 1FFB4F74381D5E08FEF10AAE8B3DBE12 /* PBXContainerItemProxy */;
+			targetProxy = 391A881E7D4829BEA99119EFEF641531 /* PBXContainerItemProxy */;
 		};
-		D1214E4F0A31749A55BB1B3DABCD6684 /* PBXTargetDependency */ = {
+		44CC30EC8A028AD19A1F85DF157AABF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = MERPageViewController;
 			target = A5976B3F90C05BB092130BA8BF447B71 /* MERPageViewController */;
-			targetProxy = FEE2DA9BE0E3CB6AFDD9FC333CE968CF /* PBXContainerItemProxy */;
+			targetProxy = 3CA2EC0740CA4E74F33B365777CC6063 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		184C54C4A96723F130F5D881B24B4585 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 30DAA31BF1CC47A25EAF09807D2EBA7F /* Pods-MERPageViewController_Tests.release.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Target Support Files/Pods-MERPageViewController_Tests/Pods-MERPageViewController_Tests-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-MERPageViewController_Tests/Pods-MERPageViewController_Tests.modulemap";
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		280A412F7F304CDCC668DF2CF3F532F7 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4FE1FB2053191072AF769B4E82D4D887 /* Pods-MERPageViewController_Tests.debug.xcconfig */;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Target Support Files/Pods-MERPageViewController_Tests/Pods-MERPageViewController_Tests-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-MERPageViewController_Tests/Pods-MERPageViewController_Tests.modulemap";
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		30792AC65936F3097861F87F9A179399 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E064E7642CD33718A3AC7216768BDE37 /* MERPageViewController.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/MERPageViewController/MERPageViewController-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/MERPageViewController/MERPageViewController-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/MERPageViewController/MERPageViewController.modulemap";
-				PRODUCT_MODULE_NAME = MERPageViewController;
-				PRODUCT_NAME = MERPageViewController;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
 		4BE66A09A74FD25164AAB3C2645B9B93 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -569,6 +473,40 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+		74D3B124E8E69ED7690D47B11B14F977 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F03967E1A48400CE7F73D7C4E0D2DB8A /* Pods-MERPageViewController_Example.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-MERPageViewController_Example/Pods-MERPageViewController_Example-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-MERPageViewController_Example/Pods-MERPageViewController_Example.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -636,7 +574,7 @@
 			};
 			name = Debug;
 		};
-		9156D03F433F5E2356D90443B5B6C101 /* Debug */ = {
+		8896A255599E6C3889A5B3D8E78CF793 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AB1079B44B46AB6D53B9F74F82E7BF95 /* Pods-MERPageViewController_Example.debug.xcconfig */;
 			buildSettings = {
@@ -669,7 +607,7 @@
 			};
 			name = Debug;
 		};
-		9B64E2FD6160B7A9F37960F458A54004 /* Release */ = {
+		94C86EE84491E2A81A3C56E4D31BD042 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E064E7642CD33718A3AC7216768BDE37 /* MERPageViewController.xcconfig */;
 			buildSettings = {
@@ -700,9 +638,39 @@
 			};
 			name = Release;
 		};
-		F21E1FCD63F68AE786005C869AD64F3F /* Release */ = {
+		C093CD1FC2B6BEDD5126DB1FE7F93B59 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F03967E1A48400CE7F73D7C4E0D2DB8A /* Pods-MERPageViewController_Example.release.xcconfig */;
+			baseConfigurationReference = E064E7642CD33718A3AC7216768BDE37 /* MERPageViewController.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/MERPageViewController/MERPageViewController-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/MERPageViewController/MERPageViewController-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/MERPageViewController/MERPageViewController.modulemap";
+				PRODUCT_MODULE_NAME = MERPageViewController;
+				PRODUCT_NAME = MERPageViewController;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		D6D92A5FE9A694C33501B0C5552B792F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4FE1FB2053191072AF769B4E82D4D887 /* Pods-MERPageViewController_Tests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CODE_SIGN_IDENTITY = "";
@@ -714,12 +682,45 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Target Support Files/Pods-MERPageViewController_Example/Pods-MERPageViewController_Example-Info.plist";
+				INFOPLIST_FILE = "Target Support Files/Pods-MERPageViewController_Tests/Pods-MERPageViewController_Tests-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-MERPageViewController_Example/Pods-MERPageViewController_Example.modulemap";
+				MODULEMAP_FILE = "Target Support Files/Pods-MERPageViewController_Tests/Pods-MERPageViewController_Tests.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		FEBEC4ACA1F8A27F4B7E7D75CC224146 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 30DAA31BF1CC47A25EAF09807D2EBA7F /* Pods-MERPageViewController_Tests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-MERPageViewController_Tests/Pods-MERPageViewController_Tests-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-MERPageViewController_Tests/Pods-MERPageViewController_Tests.modulemap";
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PODS_ROOT = "$(SRCROOT)";
@@ -737,24 +738,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		03C85545BD59F4523C644B7F8CA74464 /* Build configuration list for PBXNativeTarget "MERPageViewController" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				30792AC65936F3097861F87F9A179399 /* Debug */,
-				9B64E2FD6160B7A9F37960F458A54004 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		26F746D8DBB5487C9C998B8020979665 /* Build configuration list for PBXNativeTarget "Pods-MERPageViewController_Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				280A412F7F304CDCC668DF2CF3F532F7 /* Debug */,
-				184C54C4A96723F130F5D881B24B4585 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -764,11 +747,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		84AE8BA40740613F1819176D16250A02 /* Build configuration list for PBXNativeTarget "Pods-MERPageViewController_Example" */ = {
+		74D6B7BBC05EFD63A5545BB669B337C7 /* Build configuration list for PBXNativeTarget "MERPageViewController" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9156D03F433F5E2356D90443B5B6C101 /* Debug */,
-				F21E1FCD63F68AE786005C869AD64F3F /* Release */,
+				C093CD1FC2B6BEDD5126DB1FE7F93B59 /* Debug */,
+				94C86EE84491E2A81A3C56E4D31BD042 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7928662EE1FA706BD977AEFD3B1DCA09 /* Build configuration list for PBXNativeTarget "Pods-MERPageViewController_Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D6D92A5FE9A694C33501B0C5552B792F /* Debug */,
+				FEBEC4ACA1F8A27F4B7E7D75CC224146 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8031D0B6CC1B5BD841F033B1EAE03641 /* Build configuration list for PBXNativeTarget "Pods-MERPageViewController_Example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8896A255599E6C3889A5B3D8E78CF793 /* Debug */,
+				74D3B124E8E69ED7690D47B11B14F977 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

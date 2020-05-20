@@ -95,28 +95,16 @@
 
 #pragma mark ----------------- MERPageViewControllerDelegate -----------------
 
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController willTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController {
-//    NSLog(@"will Transition From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController willTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController transitionType:(MERTransitionType)transitionType animated:(BOOL)animated {
+    //    NSLog(@"will Transition From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
 }
 
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController didTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController {
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController didTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController transitionType:(MERTransitionType)transitionType animated:(BOOL)animated {
 //    NSLog(@"Did Transition From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
 }
 
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController willSwitchControllerFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController animated:(BOOL)animated {
-//    NSLog(@"will Swtich From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
-}
-
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController didSwitchControllerFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController animated:(BOOL)animated {
-//    NSLog(@"Did Switch From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
-}
-
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollByDragging:(UIScrollView *)scrollView {
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScroll:(nonnull UIScrollView *)scrollView transitionType:(MERTransitionType)transitionType {
 //    NSLog(@"scrollViewDidScrollByDragging ： %@", @(scrollView.contentOffset.x));
-}
-
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollBySwitching:(UIScrollView *)scrollView {
-//    NSLog(@"scrollViewDidScrollBySwitching ： %@", @(scrollView.contentOffset.x));
 }
 
 @end

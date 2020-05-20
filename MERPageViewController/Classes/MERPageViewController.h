@@ -36,18 +36,32 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+typedef NS_ENUM(NSUInteger, MERTransitionType) {
+    MERTransitionTypeDragging = 0, /// 使用手势拖动方式切换
+    MERTransitionTypeSwitch   = 1, /// 使用 -showPageAtIndex:animated: 切换
+};
+
 @protocol MERPageViewControllerDelegate <NSObject>
 
 @optional
 
-// 手势滑动触发此处代理
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController willTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController;
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController didTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController;
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollByDragging:(UIScrollView *)scrollView;
-// 调用 -showPageAtIndex:animated: 触发此处代理
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController willSwitchControllerFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController animated:(BOOL)animated;
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController didSwitchControllerFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController animated:(BOOL)animated;
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScrollBySwitching:(UIScrollView *)scrollView;
+/// transitionType 切换的方式
+/// 切换发起回调
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController
+            willTransitionFrom:(UIViewController *)previousViewController
+              toViewController:(UIViewController *)pendingViewController
+                transitionType:(MERTransitionType)transitionType
+                      animated:(BOOL)animated;
+/// 切换完成回调
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController
+             didTransitionFrom:(UIViewController *)previousViewController
+              toViewController:(UIViewController *)pendingViewController
+                transitionType:(MERTransitionType)transitionType
+                      animated:(BOOL)animated;
+/// scrollView 滑动代理
+- (void)mer_pageViewController:(MERPageViewController *)pageViewController
+           scrollViewDidScroll:(UIScrollView *)scrollView
+                transitionType:(MERTransitionType)transitionType;
 @end
 
 @protocol MERPageViewControllerDataSource <NSObject>
@@ -62,16 +76,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MERPageViewController ()
 
-// Override，no need to call super
-
-// 当手势切换发起时调用
-- (void)pageViewControllerWillTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
-// 当手势切换结束时调用
-- (void)pageViewControllerDidTransitionFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex;
-// 当 -showPageAtIndex:animated: 触发时调用
-- (void)pageViewControllerWillShowFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex animated:(BOOL)animated;
-// 当 -showPageAtIndex:animated: 完成时调用
-- (void)pageViewControllerDidShowFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex animated:(BOOL)animated;
+// To override，no need to call super
+- (void)pageViewControllerWillTransitionFromIndex:(NSInteger)fromIndex
+                                          toIndex:(NSInteger)toIndex
+                                   transitionType:(MERTransitionType)transitionType
+                                         animated:(BOOL)animated;
+- (void)pageViewControllerDidTransitionFromIndex:(NSInteger)fromIndex
+                                         toIndex:(NSInteger)toIndex
+                                  transitionType:(MERTransitionType)transitionType
+                                        animated:(BOOL)animated;
 
 @end
 
