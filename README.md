@@ -13,7 +13,7 @@
 
 ## Support
 
-Objective-C & iOS 8+.
+Swift 4.2 & iOS 9+.
 
 ## Example
 

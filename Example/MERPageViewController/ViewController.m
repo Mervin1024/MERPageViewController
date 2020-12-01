@@ -1,27 +1,26 @@
 //
-//  MERViewController.m
-//  MERPageViewController
+//  ViewController.m
+//  MERPageViewController_Example
 //
-//  Created by Mervin1024 on 05/05/2019.
-//  Copyright (c) 2019 Mervin1024. All rights reserved.
+//  Created by mayao's Mac on 2020/12/1.
+//  Copyright © 2020 CocoaPods. All rights reserved.
 //
 
-#import "MERViewController.h"
-#import <MERPageViewController/MERPageViewController.h>
-#import "MERTestChildViewController.h"
+#import "ViewController.h"
+#import "TestChildViewController.h"
+@import MERPageViewController;
 
-@interface MERViewController () <MERPageViewControllerDataSource, MERPageViewControllerDelegate>
+@interface ViewController () <MERPageViewControllerDataSource, MERPageViewControllerDelegate>
 @property (nonatomic, strong) MERPageViewController *pageViewController;
 @property (nonatomic, strong) NSMutableArray<UIViewController *> *pageControllers;
 @end
 
-@implementation MERViewController
-
+@implementation ViewController
 - (NSMutableArray<UIViewController *> *)pageControllers {
     if (!_pageControllers) {
         _pageControllers = [NSMutableArray arrayWithCapacity:10];
         for (int i = 0; i < 10; i++) {
-            MERTestChildViewController *controller = [[MERTestChildViewController alloc] init];
+            TestChildViewController *controller = [[TestChildViewController alloc] init];
             controller.index = i;
             [_pageControllers addObject:controller];
         }
@@ -29,10 +28,9 @@
     return _pageControllers;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-	
+    // Do any additional setup after loading the view.
     self.pageViewController = [[MERPageViewController alloc] init];
     self.pageViewController.dataSource = self;
     self.pageViewController.delegate = self;
@@ -61,19 +59,13 @@
 
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (void)touchButtonPressed:(id)sender {
     NSInteger currentIndex = self.pageViewController.currentIndex;
     NSInteger targetIndex;
     do {
         targetIndex = arc4random()%(self.pageControllers.count);
     } while (currentIndex == targetIndex);
-    [self.pageViewController showPageAtIndex:targetIndex animated:YES completion:nil];
+    [self.pageViewController showPageAt:targetIndex animated:YES completion:nil];
 }
 
 - (void)reloadButtonPressed:(id)sender {
@@ -83,28 +75,34 @@
 }
 
 #pragma mark ----------------- MERPageViewControllerDataSource -----------------
-
-- (nonnull UIViewController *)mer_pageViewController:(nonnull MERPageViewController *)pageViewController controllerAtIndex:(NSInteger)index {
-    return [self.pageControllers objectAtIndex:index];
-}
-
-- (NSInteger)numberOfControllersInPageViewController:(nonnull MERPageViewController *)pageViewController {
+- (NSInteger)numberOfControllersIn:(MERPageViewController *)controller {
     return self.pageControllers.count;
 }
 
+- (UIViewController *)mer_pageViewController:(MERPageViewController *)controller controllerAt:(NSInteger)index {
+    return [self.pageControllers objectAtIndex:index];
+}
 
 #pragma mark ----------------- MERPageViewControllerDelegate -----------------
-
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController willTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController transitionType:(MERTransitionType)transitionType animated:(BOOL)animated {
-    //    NSLog(@"will Transition From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
+- (void)mer_pageViewController:(MERPageViewController *)controller willTransitionFrom:(NSInteger)willTransitionFrom to:(NSInteger)to transitionType:(enum TransitionType)transitionType animated:(BOOL)animated {
+    
 }
 
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController didTransitionFrom:(UIViewController *)previousViewController toViewController:(UIViewController *)pendingViewController transitionType:(MERTransitionType)transitionType animated:(BOOL)animated {
-//    NSLog(@"Did Transition From : %@ ,To : %@", @([self.pageControllers indexOfObject:previousViewController]), @([self.pageControllers indexOfObject:pendingViewController]));
+- (void)mer_pageViewController:(MERPageViewController *)controller didTransitionFrom:(NSInteger)didTransitionFrom to:(NSInteger)to transitionType:(enum TransitionType)transitionType animated:(BOOL)animated {
+    
 }
 
-- (void)mer_pageViewController:(MERPageViewController *)pageViewController scrollViewDidScroll:(nonnull UIScrollView *)scrollView transitionType:(MERTransitionType)transitionType {
-//    NSLog(@"scrollViewDidScrollByDragging ： %@", @(scrollView.contentOffset.x));
+- (void)mer_pageViewController:(MERPageViewController *)controller scrollViewDidScroll:(UIScrollView *)scrollViewDidScroll transitionType:(enum TransitionType)transitionType {
+    
 }
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
 
 @end

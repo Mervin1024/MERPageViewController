@@ -1,7 +1,5 @@
 use_frameworks!
 
-platform :ios, '8.0'
-
 target 'MERPageViewController_Example' do
   pod 'MERPageViewController', :path => '../'
 

@@ -1,22 +1,22 @@
 //
-//  MERTestChildViewController.m
+//  TestChildViewController.m
 //  MERPageViewController_Example
 //
-//  Created by mayao's Mac on 2019/5/9.
-//  Copyright © 2019 Mervin1024. All rights reserved.
+//  Created by mayao's Mac on 2020/12/1.
+//  Copyright © 2020 CocoaPods. All rights reserved.
 //
 
-#import "MERTestChildViewController.h"
+#import "TestChildViewController.h"
 
-@interface MERTestChildViewController ()
+@interface TestChildViewController ()
 
 @end
 
-@implementation MERTestChildViewController
+@implementation TestChildViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor colorWithRed:(arc4random()%255)/255.f green:(arc4random()%255)/255.f blue:(arc4random()%255)/255.f alpha:1];
 
     UILabel *label = [[UILabel alloc] init];
@@ -49,5 +49,14 @@
     NSLog(@"Did Disappear :    %@", @(self.index));
 }
 
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
 
 @end

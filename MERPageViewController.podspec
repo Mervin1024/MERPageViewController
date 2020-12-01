@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MERPageViewController'
-  s.version          = '1.1.0'
+  s.version          = '1.2.0'
   s.summary          = 'Custom horizontal scroll PageViewController. Support paging scroll and transition with animation.'
 
 # This description is used to generate tags and improve search results.
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-                       'Because the UIPageViewController has some bugs in UIPageViewControllerTransitionStyleScroll & UIPageViewControllerNavigationOrientationHorizontal, so custom a horizontal scroll PageViewController.'
+  'Because the UIPageViewController has some bugs in UIPageViewControllerTransitionStyleScroll & UIPageViewControllerNavigationOrientationHorizontal, so custom a horizontal scroll PageViewController.'
                        DESC
 
   s.homepage         = 'https://github.com/Mervin1024/MERPageViewController'
@@ -29,7 +29,8 @@ Pod::Spec.new do |s|
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '8.0'
-
+  s.swift_version = '4.2'
+  
   s.source_files = 'MERPageViewController/Classes/**/*'
   
   # s.resource_bundles = {
