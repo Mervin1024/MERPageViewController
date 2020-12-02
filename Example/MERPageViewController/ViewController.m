@@ -40,7 +40,6 @@
     
     self.pageViewController.pageBounces = NO;
     
-    
     UIButton *touchButton = [UIButton buttonWithType:UIButtonTypeSystem];
     touchButton.titleLabel.font = [UIFont systemFontOfSize:30];
     [touchButton setTitle:@"随机跳转" forState:UIControlStateNormal];
