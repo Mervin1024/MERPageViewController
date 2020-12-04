@@ -12,20 +12,18 @@
 
 @interface ViewController () <MERPageViewControllerDataSource, MERPageViewControllerDelegate>
 @property (nonatomic, strong) MERPageViewController *pageViewController;
-@property (nonatomic, strong) NSMutableArray<UIViewController *> *pageControllers;
+@property (nonatomic, strong) NSMutableArray<NSString *> *dataArray;
 @end
 
 @implementation ViewController
-- (NSMutableArray<UIViewController *> *)pageControllers {
-    if (!_pageControllers) {
-        _pageControllers = [NSMutableArray arrayWithCapacity:10];
-        for (int i = 0; i < 10; i++) {
-            TestChildViewController *controller = [[TestChildViewController alloc] init];
-            controller.index = i;
-            [_pageControllers addObject:controller];
+- (NSMutableArray<NSString *> *)dataArray {
+    if (!_dataArray) {
+        _dataArray = [NSMutableArray arrayWithCapacity:10];
+        for (NSInteger i = 0; i < 10; i++) {
+            [_dataArray addObject:@(i).description];
         }
     }
-    return _pageControllers;
+    return _dataArray;
 }
 
 - (void)viewDidLoad {
@@ -36,9 +34,9 @@
     self.pageViewController.delegate = self;
     [self addChildViewController:self.pageViewController];
     [self.view addSubview:self.pageViewController.view];
-    self.pageViewController.view.frame = [UIScreen mainScreen].bounds;
-    
+    self.pageViewController.view.frame = self.view.bounds;
     self.pageViewController.pageBounces = NO;
+    [self.pageViewController registerClass:TestChildViewController.class];
     
     UIButton *touchButton = [UIButton buttonWithType:UIButtonTypeSystem];
     touchButton.titleLabel.font = [UIFont systemFontOfSize:30];
@@ -48,38 +46,28 @@
     touchButton.center = CGPointMake(self.view.center.x, self.view.center.y - 100);
     [touchButton addTarget:self action:@selector(touchButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
-    UIButton *reloadButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    reloadButton.titleLabel.font = [UIFont systemFontOfSize:30];
-    [reloadButton setTitle:@"刷新数据" forState:UIControlStateNormal];
-    [reloadButton sizeToFit];
-    [self.view addSubview:reloadButton];
-    reloadButton.center = CGPointMake(self.view.center.x, self.view.center.y + 100);
-    [reloadButton addTarget:self action:@selector(reloadButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-
 }
 
 - (void)touchButtonPressed:(id)sender {
     NSInteger currentIndex = self.pageViewController.currentIndex;
     NSInteger targetIndex;
     do {
-        targetIndex = arc4random()%(self.pageControllers.count);
+        targetIndex = arc4random()%(self.dataArray.count);
     } while (currentIndex == targetIndex);
     [self.pageViewController showPageAt:targetIndex animated:YES completion:nil];
 }
 
-- (void)reloadButtonPressed:(id)sender {
-    self.pageControllers = nil;
-    self.pageViewController.contentInsets = UIEdgeInsetsMake(arc4random()%100, 0, 0, 0);
-    [self.pageViewController reloadData];
-}
-
 #pragma mark ----------------- MERPageViewControllerDataSource -----------------
 - (NSInteger)numberOfControllersIn:(MERPageViewController *)controller {
-    return self.pageControllers.count;
+    return self.dataArray.count;
 }
 
 - (UIViewController *)mer_pageViewController:(MERPageViewController *)controller controllerAt:(NSInteger)index {
-    return [self.pageControllers objectAtIndex:index];
+    UIViewController *child = [controller dequeueReusableChild:TestChildViewController.class forIndex:index];
+    if ([child isKindOfClass:TestChildViewController.class]) {
+        [(TestChildViewController *)child setName:self.dataArray[index]];
+    }
+    return child;
 }
 
 #pragma mark ----------------- MERPageViewControllerDelegate -----------------

@@ -32,17 +32,6 @@ private extension UIViewController {
         self.view.removeFromSuperview()
         self.removeFromParent()
     }
-    
-    static let mer_reusableIdentifierKey = UnsafeRawPointer.init(bitPattern: "mer_reusableIdentifierKey".hashValue)!
-    var mer_reusableIdentifier: String? {
-        set {
-            objc_setAssociatedObject(self, UIViewController.mer_reusableIdentifierKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-        get {
-            objc_getAssociatedObject(self, UIViewController.mer_reusableIdentifierKey) as? String
-        }
-    }
-
 }
 
 @objc public protocol MERPageViewControllerDelegate {
@@ -123,6 +112,7 @@ open class MERPageViewController: UIViewController {
         scrollView.isPagingEnabled = true
         scrollView.backgroundColor = .clear
         scrollView.scrollsToTop = false
+        scrollView.isDirectionalLockEnabled = true
         if #available(iOS 11.0, *) {
             scrollView.contentInsetAdjustmentBehavior = .never
         } else {
@@ -139,8 +129,8 @@ open class MERPageViewController: UIViewController {
         return view
     }()
     /// 用来保留当前展示及需要展示的 VC，与重用池相斥
-    private lazy var cache: MERLRUCache<(Int, UIViewController)> = {
-        let cache = MERLRUCache<(Int, UIViewController)>()
+    private lazy var cache: MERLRUCache<UIViewController> = {
+        let cache = MERLRUCache<UIViewController>()
         cache.name = "MERPageViewControllerCache"
         /// 这个值请勿随便修改，可能引起 bug
         /// 往大了改还好说，往小了改必出问题
@@ -148,19 +138,12 @@ open class MERPageViewController: UIViewController {
         cache.shouldRemoveAllObjectsOnMemoryWarning = false
         cache.shouldRemoveAllObjectsWhenEnteringBackground = false
         cache.setWillEvictCallback { [weak self] in
-            self?.cacheWillEvict($0)
-        }
-        cache.setDidEnterBackgroundCallback { [weak self] in
-            self?.cacheDidEnterBackground()
-        }
-        cache.setDidReceiveMemoryWarningCallback { [weak self] in
-            self?.cacheDidReceiveMemoryWarning()
+            self?.putReusableControllerIntoPool($0)
         }
         return cache
     }()
-    /// 即将被从列表页面中移出的 VC 集合
-    private lazy var childDelayRemoveSet = Set<UIViewController>()
-    
+        
+    /// vc 重用池
     private lazy var registerMap = [String : Set<UIViewController>]()
     
     /// 从 scrollView 移除 vc，并回收入到重用池
@@ -170,62 +153,23 @@ open class MERPageViewController: UIViewController {
             registerMap[identifier]?.insert(vc)
         }
     }
-    
-    private func cacheWillEvict(_ obj: (Int, UIViewController)) {
-        let index = obj.0
-        let vc = obj.1
-        /**
-         -------------------------------------------------------------------------------------
-         childDelayRemoveSet 仅作为容错机制存在，理论上逻辑不出错的情况下，不会使用到 childDelayRemoveSet
-         -------------------------------------------------------------------------------------
-         */
-        /// 当 queuingScrollView 处于 isDragging 状态，Tracking 和 Decelerating 状态都是 NO。
-        /// 判断全部为 NO ，代表着缓存清除不是由连续的页面交互触发的
-        if !self.queuingScrollView.isDragging,
-           !self.queuingScrollView.isTracking,
-           !self.queuingScrollView.isDecelerating {
-            if visibleIndexs.contains(index) {
-                /// 加入 延迟 remove 集合，等待后续机会移除
-                self.childDelayRemoveSet.insert(vc)
-            }
-        } else if (self.queuingScrollView.isDragging) {
-            let range = max(0, visibleIndexs.from - 1)...min(visibleIndexs.from + 1, self.pageCount)
-            if range.contains(index) {
-                /// 加入 延迟 remove 集合，等待后续机会移除
-                self.childDelayRemoveSet.insert(vc)
-            }
-        }
-        if !self.childDelayRemoveSet.contains(vc) {
-            /// 对于没有加入 延迟 remove 集合的 vc，直接移除
-            self.putReusableControllerIntoPool(vc)
-        }
-    }
-    
-    private func cacheDidEnterBackground() {
-        DispatchQueue.main.async {
-            self.clearChildDelayRemoveSet()
-        }
-    }
-    
-    private func cacheDidReceiveMemoryWarning() {
-        DispatchQueue.main.async {
-            self.clearChildDelayRemoveSet()
-        }
-    }
-    
+        
     private var pageCount: Int {
         guard let dataSource = self.dataSource else { return 0 }
         return dataSource.numberOfControllers(in: self)
     }
     
-    private func controller(at index: Int, request: Bool = true) -> UIViewController? {
+    private func controller(at index: Int, cacheOnly: Bool = false) -> UIViewController? {
         guard index >= 0, index < self.pageCount else { return nil }
-        if let (_, controller) = self.cache[index] {
+        if let controller = self.cache[index] {
             return controller
         }
-        if request, let dataSource = self.dataSource {
+        guard !cacheOnly else {
+            return nil
+        }
+        if let dataSource = self.dataSource {
             let controller = dataSource.mer_pageViewController(self, controllerAt: index)
-            self.cache[index] = (index, controller)
+            self.cache[index] = controller
             return controller
         }
         return nil
@@ -239,24 +183,27 @@ open class MERPageViewController: UIViewController {
         self.mer_addChildViewController(controller, in: self.queuingScrollView, frame: frame)
     }
     
-    private func addPreloadViewController() {
-        let _ = self.controller(at: currentIndex)
-        self.addVisibleViewController(for: currentIndex - 1)
-        self.addVisibleViewController(for: currentIndex + 1)
+    private func finishChangedCurrentChild() {
+        func addPreloadViewController() {
+            /// 将当前 vc 置于 LRU 的头部
+            let _ = self.controller(at: currentIndex)
+            self.addVisibleViewController(for: currentIndex - 1)
+            self.addVisibleViewController(for: currentIndex + 1)
+        }
+        
+        func removeChildNotDisplayed() {
+            /// 将当前 vc 置于 LRU 的头部
+            let _ = self.controller(at: currentIndex)
+            self.cache.trim(to: 1)
+        }
+        
+        if isPreloadEnabled {
+            addPreloadViewController()
+        } else {
+            removeChildNotDisplayed()
+        }
     }
     
-    private func clearChildDelayRemoveSet() {
-        /// 不要把当前页面移出
-        if let currentVC = self.currentViewController, self.childDelayRemoveSet.contains(currentVC) {
-            self.childDelayRemoveSet.remove(currentVC)
-            self.cache[currentIndex] = (currentIndex, currentVC)
-        }
-        /// 从父 View 移出其他所有的 VC
-        self.childDelayRemoveSet.forEach({
-            self.putReusableControllerIntoPool($0)
-        })
-        self.childDelayRemoveSet.removeAll()
-    }
     
     //MARK: --- Calculate ---
     private func calculateVisibleViewOffset(for index: Int) -> CGPoint {
@@ -366,9 +313,7 @@ open class MERPageViewController: UIViewController {
             self.didTransition(from: visibleIndexs.from, to: visibleIndexs.to, transitionType: .switching, animated: false)
             self.delegate?.mer_pageViewController?(self, didTransitionFrom: visibleIndexs.from, to: visibleIndexs.to, transitionType: .switching, animated: false)
             self.visibleIndexs.end(at: currentIndex)
-            if needPreload {
-                self.addPreloadViewController()
-            }
+            self.finishChangedCurrentChild()
         }
         currentController?.endAppearanceTransition()
     }
@@ -442,7 +387,7 @@ open class MERPageViewController: UIViewController {
     
     @objc public private(set) var currentIndex: Int = 0
     @objc public var currentViewController: UIViewController? {
-        self.cache[currentIndex]?.1
+        self.cache[currentIndex]
     }
     
     /// 是否支持弹性效果，默认为 true
@@ -466,7 +411,7 @@ open class MERPageViewController: UIViewController {
     }
     
     /// 是否需要预加载（滑动结束时加载左右两边的 VC）
-    @objc public var needPreload = false
+    @objc public var isPreloadEnabled = false
         
     ///  通过代码直接更改当前显示 VC，区别于手部拖动更改 VC
     ///
@@ -485,85 +430,43 @@ open class MERPageViewController: UIViewController {
         guard self.queuingScrollView.frame.width > 0 && self.queuingScrollView.contentSize.width > 0 else {
             return
         }
-        
+        /// 当上次 showPage 还未执行完成，又调用了同样 index 的 showPage 时，记该次调用无效，等待之前动画完成即可
+        if self.visibleIndexs.to == index && isSwitchAnimating {
+            return
+        }
+        /// 当前停止的页面和 showPage 的目标页面相同时，记该次调用无效
+        if self.visibleIndexs.to == index && self.visibleIndexs.from == index {
+            return
+        }
         /// 如果 scrollView 正处于滑动状态，先停止滑动并结算 Child 的状态，再执行动画
         if self.queuingScrollView.isDragging || self.queuingScrollView.isDecelerating {
             self.queuingScrollView.setContentOffset(self.calculateVisibleViewOffset(for: visibleIndexs.to), animated: false)
             self.updatePageViewAfterTragging(queuingScrollView)
+            /// 结算后发现停止滑动的位置就是 showPage 的目标位置，直接 return
+            if self.visibleIndexs.to == index {
+                /// 终止手指的滑动行为
+                self.queuingScrollView.panGestureRecognizer.isEnabled = false
+                DispatchQueue.main.async {
+                    self.queuingScrollView.panGestureRecognizer.isEnabled = true
+                }
+                return
+            }
         }
-        
+        /**
+         代码至此才可以保证 showPage 的前后两个 vc 一定不为同一个
+         */
         let oldVisibleIndexs = self.visibleIndexs
         self.visibleIndexs.scroll(to: Int(index))
         /// 动画期间使用预先保存的 index
         let visible = self.visibleIndexs
         self.currentIndex = self.visibleIndexs.to
         
+        /// 此处的三次 controller(at: 调用顺序不可变，才能够保证首先被释放重用的是 oldFromVC
+        let oldFromVC = self.controller(at: oldVisibleIndexs.from, cacheOnly: true)
         guard let fromVC = self.controller(at: visible.from),
               let toVC = self.controller(at: visible.to) else {
             fatalError("pageCount > 0 时不会取不到 ChildViewController")
         }
-        /// 滚动执行之前的处理
-        func scrollBeforeAnimation() {
-            /// 将上次未完成的 view 放置回 scrollView 的原位
-            if self.isSwitchAnimating {
-                if oldVisibleIndexs.from != visible.from || oldVisibleIndexs.from != visible.to {
-                    let oldFromVC = self.controller(at: oldVisibleIndexs.from, request: false)
-                    oldFromVC?.endAppearanceTransition()
-                    moveChild(oldFromVC, backToOriginPosition: oldVisibleIndexs.from)
-                }
-            }
-
-            self.isSwitchAnimating = true
-            self.queuingScrollView.panGestureRecognizer.isEnabled = false
-            self.switchAnimationContentView.isHidden = false
-            /// 添加对应的 VC 到 scrollView 上，并通知代理
-            self.willTransition(from: visible.from, to: visible.to, transitionType: .switching, animated: animated)
-            self.delegate?.mer_pageViewController?(self, willTransitionFrom: visible.from, to: visible.to, transitionType: .switching, animated: animated)
-            self.addVisibleViewController(for: visible.to)
-            if visible.to != visible.from {
-                fromVC.beginAppearanceTransition(false, animated: animated)
-            }
-            toVC.beginAppearanceTransition(true, animated: animated)
-        }
-        /// 伪动画执行完成时的处理
-        /// 如果不采用动画形式，将直接调用该 block
-        func scrollAnimationCompleted() {
-            self.queuingScrollView.setContentOffset(self.calculateVisibleViewOffset(for: visible.to), animated: false)
-        }
-        /// 滚动执行结束后的处理
-        func scrollAfterAnimation() {
-            self.isSwitchAnimating = false
-            self.queuingScrollView.panGestureRecognizer.isEnabled = true
-            self.switchAnimationContentView.isHidden = true
-            
-            if visible.to != visible.from {
-                fromVC.endAppearanceTransition()
-            }
-            toVC.endAppearanceTransition()
-            /// 通知结束代理，并清掉不显示的 VC
-            self.didTransition(from: visible.from, to: visible.to, transitionType: .switching, animated: animated)
-            self.delegate?.mer_pageViewController?(self, didTransitionFrom: visible.from, to: visible.to, transitionType: .switching, animated: animated)
-            self.visibleIndexs.end(at: visible.to)
-
-            if needPreload {
-                self.addPreloadViewController()
-            }
-            self.clearChildDelayRemoveSet()
-        }
-        
-        /// 执行伪切换动画
-        scrollBeforeAnimation()
-        guard animated == true, visible.from != visible.to else {
-            /// 以无动画形式结束此次切换
-            scrollAnimationCompleted()
-            scrollAfterAnimation()
-            completion?(true)
-            return
-        }
-        let pageSize = self.queuingScrollView.frame.size
-        let direction: PageDirection = visible.from < visible.to ? .right : .left
-        let duration: TimeInterval = 0.3
-        
         /// 用来重置被用来执行伪动画的 VC 的位置
         func moveChild(_ child: UIViewController?, backToOriginPosition index: Int) {
             guard index >= 0, index < self.pageCount else { return }
@@ -580,11 +483,69 @@ open class MERPageViewController: UIViewController {
                 self.queuingScrollView.addSubview(controller.view)
             }
         }
-        /// 取消之前未完成的动画
-        self.switchAnimationContentView.layer.removeAllAnimations()
+
+        /// 滚动执行之前的处理
+        func scrollBeforeAnimation() {
+            /// 取消之前未完成的动画
+            self.switchAnimationContentView.layer.removeAllAnimations()
+            /// 将上次未完成的 view 放置回 scrollView 的原位
+            if self.isSwitchAnimating {
+                if oldVisibleIndexs.from != visible.from || oldVisibleIndexs.from != visible.to {
+                    oldFromVC?.endAppearanceTransition()
+                    oldFromVC?.view.layer.removeAllAnimations()
+                    moveChild(oldFromVC, backToOriginPosition: oldVisibleIndexs.from)
+                }
+            }
+
+            fromVC.view.layer.removeAllAnimations()
+            toVC.view.layer.removeAllAnimations()
+
+            self.isSwitchAnimating = true
+            self.queuingScrollView.panGestureRecognizer.isEnabled = false
+            self.switchAnimationContentView.isHidden = false
+            /// 添加对应的 VC 到 scrollView 上，并通知代理
+            self.willTransition(from: visible.from, to: visible.to, transitionType: .switching, animated: animated)
+            self.delegate?.mer_pageViewController?(self, willTransitionFrom: visible.from, to: visible.to, transitionType: .switching, animated: animated)
+            self.addVisibleViewController(for: visible.to)
+            fromVC.beginAppearanceTransition(false, animated: animated)
+            toVC.beginAppearanceTransition(true, animated: animated)
+        }
+        /// 伪动画执行完成时的处理
+        /// 如果不采用动画形式，将直接调用该 block
+        func scrollAnimationCompleted() {
+            self.queuingScrollView.setContentOffset(self.calculateVisibleViewOffset(for: visible.to), animated: false)
+        }
+        /// 滚动执行结束后的处理
+        func scrollAfterAnimation() {
+            self.isSwitchAnimating = false
+            self.queuingScrollView.panGestureRecognizer.isEnabled = true
+            self.switchAnimationContentView.isHidden = true
+            
+            fromVC.endAppearanceTransition()
+            toVC.endAppearanceTransition()
+            /// 通知结束代理，并清掉不显示的 VC
+            self.didTransition(from: visible.from, to: visible.to, transitionType: .switching, animated: animated)
+            self.delegate?.mer_pageViewController?(self, didTransitionFrom: visible.from, to: visible.to, transitionType: .switching, animated: animated)
+            self.visibleIndexs.end(at: visible.to)
+            self.finishChangedCurrentChild()
+        }
+        
         /// 记录当前动画时间
         let currentBeginTime = CACurrentMediaTime()
         self.switchAnimationBeginTime = currentBeginTime
+        /// 执行伪切换动画
+        scrollBeforeAnimation()
+        guard animated == true, visible.from != visible.to else {
+            /// 以无动画形式结束此次切换
+            scrollAnimationCompleted()
+            scrollAfterAnimation()
+            completion?(true)
+            return
+        }
+        let pageSize = self.queuingScrollView.frame.size
+        let direction: PageDirection = visible.from < visible.to ? .right : .left
+        let duration: TimeInterval = 0.3
+
         /// 计算动画需要的坐标
         let fromViewStartOrigin: CGPoint = .zero
         let toViewStartOrigin: CGPoint = {
@@ -635,10 +596,6 @@ open class MERPageViewController: UIViewController {
             currentIndex = 0
             visibleIndexs.end(at: currentIndex)
             self.cache.removeAll()
-            self.childDelayRemoveSet.forEach({
-                self.putReusableControllerIntoPool($0)
-            })
-            self.childDelayRemoveSet.removeAll()
             self.updateScrollViewLayoutIfNeeded()
             self.updateScrollViewDisplayIndexIfNeeded()
             return
@@ -646,19 +603,12 @@ open class MERPageViewController: UIViewController {
         
         currentIndex = min(currentIndex, self.pageCount - 1)
         self.cache.removeAll()
-        self.childDelayRemoveSet.forEach({
-            self.putReusableControllerIntoPool($0)
-        })
-        self.childDelayRemoveSet.removeAll()
-        
         let currentVC = self.controller(at: currentIndex)
         currentVC?.beginAppearanceTransition(true, animated: false)
         self.updateScrollViewLayoutIfNeeded()
         self.updateScrollViewDisplayIndexIfNeeded()
         currentVC?.endAppearanceTransition()
-        if needPreload {
-            self.addPreloadViewController()
-        }
+        self.finishChangedCurrentChild()
     }
     
     /// 更新 PageViewController 的 contentSize
@@ -708,21 +658,18 @@ extension MERPageViewController: UIScrollViewDelegate {
         
         /// 最终确定的位置与开始位置相同时，需要重新显示开始位置的视图，以及 dismiss 最近一次猜测的位置的视图。
         if oldVisible.from == toIndex, oldVisible.from != oldVisible.to {
-            self.controller(at: oldVisible.to, request: false)?.beginAppearanceTransition(false, animated: true)
-            self.controller(at: toIndex, request: false)?.beginAppearanceTransition(true, animated: true)
-            self.controller(at: oldVisible.to, request: false)?.endAppearanceTransition()
-            self.controller(at: toIndex, request: false)?.endAppearanceTransition()
+            self.controller(at: oldVisible.to, cacheOnly: true)?.beginAppearanceTransition(false, animated: true)
+            self.controller(at: toIndex, cacheOnly: true)?.beginAppearanceTransition(true, animated: true)
+            self.controller(at: oldVisible.to, cacheOnly: true)?.endAppearanceTransition()
+            self.controller(at: toIndex, cacheOnly: true)?.endAppearanceTransition()
         } else {
-            self.controller(at: oldVisible.from, request: false)?.endAppearanceTransition()
-            self.controller(at: toIndex, request: false)?.endAppearanceTransition()
+            self.controller(at: oldVisible.from, cacheOnly: true)?.endAppearanceTransition()
+            self.controller(at: toIndex, cacheOnly: true)?.endAppearanceTransition()
         }
         
         self.didTransition(from: fromIndex, to: visibleIndexs.to, transitionType: .dragging, animated: true)
         self.delegate?.mer_pageViewController?(self, didTransitionFrom: fromIndex, to: visibleIndexs.to, transitionType: .dragging, animated: true)
-        if needPreload {
-            self.addPreloadViewController()
-        }
-        self.clearChildDelayRemoveSet()
+        self.finishChangedCurrentChild()
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -749,8 +696,8 @@ extension MERPageViewController: UIScrollViewDelegate {
         guard oldVisible != visibleIndexs, left < right else { return }
 
         /// 这里的几次调用 controller(at: 的顺序会影响 cache 内部 lru 排序，进而影响 child 的 Appearance 方法调用顺序
-        let oldFromVC = self.controller(at: oldVisible.from, request: false)
-        let oldToVC = self.controller(at: oldVisible.to, request: false)
+        let oldFromVC = self.controller(at: oldVisible.from, cacheOnly: true)
+        let oldToVC = self.controller(at: oldVisible.to, cacheOnly: true)
         let fromVC = self.controller(at: visibleIndexs.from)
         let toVC = self.controller(at: visibleIndexs.to)
         if visibleIndexs.to != currentIndex {
@@ -795,12 +742,25 @@ extension MERPageViewController: UIScrollViewDelegate {
     @objc optional func prepareForReuse()
 }
 
+private extension UIViewController {
+    static let mer_reusableIdentifierKey = UnsafeRawPointer.init(bitPattern: "mer_reusableIdentifierKey".hashValue)!
+    var mer_reusableIdentifier: String? {
+        set {
+            objc_setAssociatedObject(self, UIViewController.mer_reusableIdentifierKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+        get {
+            objc_getAssociatedObject(self, UIViewController.mer_reusableIdentifierKey) as? String
+        }
+    }
+}
+
 /// Child 重用拓展
 extension MERPageViewController {
     public typealias ReusableController = UIViewController & MERPageReusable
     
     /// 注册可重用的 ViewController 类型
-    @objc public func register(_ childClass: ReusableController.Type) {
+    @objc(registerClass:)
+    public func register(_ childClass: ReusableController.Type) {
         let identifier = "\(childClass)"
         if self.registerMap[identifier] == nil {
             self.registerMap[identifier] = Set<UIViewController>()
@@ -822,7 +782,7 @@ extension MERPageViewController {
         }
     }
 
-    @objc public func dequeueReusableChild(_ childClass: ReusableController.Type, for index: Int) -> ReusableController {
+    @objc public func dequeueReusableChild(_ childClass: ReusableController.Type, forIndex index: Int) -> ReusableController {
         let identifier = "\(childClass)"
         guard let _ = self.registerMap[identifier] else { fatalError("This class (\(identifier)) is not registered") }
         if let controller = self.registerMap[identifier]?.popFirst() as? ReusableController {

@@ -7,11 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+@import MERPageViewController;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TestChildViewController : UIViewController
-@property (nonatomic, assign) NSInteger index;
+@interface TestChildViewController : UIViewController <MERPageReusable>
+@property (nonatomic, assign) NSString *name;
 @end
 
 NS_ASSUME_NONNULL_END

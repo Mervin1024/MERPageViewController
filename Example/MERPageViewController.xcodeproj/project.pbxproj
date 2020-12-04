@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		111AE2EE257651DA004D4B23 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111AE2ED257651DA004D4B23 /* ViewController.m */; };
 		111AE2F72576530B004D4B23 /* TestChildViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111AE2F62576530B004D4B23 /* TestChildViewController.m */; };
+		111AE340257A3CC1004D4B23 /* ViewController_Swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111AE33F257A3CC1004D4B23 /* ViewController_Swift.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
@@ -34,6 +35,7 @@
 		111AE2ED257651DA004D4B23 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		111AE2F52576530B004D4B23 /* TestChildViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestChildViewController.h; sourceTree = "<group>"; };
 		111AE2F62576530B004D4B23 /* TestChildViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestChildViewController.m; sourceTree = "<group>"; };
+		111AE33F257A3CC1004D4B23 /* ViewController_Swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController_Swift.swift; sourceTree = "<group>"; };
 		5EC64D56C436055CCB0DBC20 /* Pods_MERPageViewController_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MERPageViewController_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD01AFB9204008FA782 /* MERPageViewController_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MERPageViewController_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
+				111AE33F257A3CC1004D4B23 /* ViewController_Swift.swift */,
 				111AE2EC257651DA004D4B23 /* ViewController.h */,
 				111AE2ED257651DA004D4B23 /* ViewController.m */,
 				111AE2F52576530B004D4B23 /* TestChildViewController.h */,
@@ -340,6 +343,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				111AE340257A3CC1004D4B23 /* ViewController_Swift.swift in Sources */,
 				111AE2F72576530B004D4B23 /* TestChildViewController.m in Sources */,
 				111AE2EE257651DA004D4B23 /* ViewController.m in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,

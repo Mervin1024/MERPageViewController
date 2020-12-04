@@ -9,10 +9,16 @@
 #import "TestChildViewController.h"
 
 @interface TestChildViewController ()
-
+@property (nonatomic, strong) UILabel *nameLabel;
 @end
 
 @implementation TestChildViewController
+
+- (void)setName:(NSString *)name {
+    _name = name;
+    self.nameLabel.text = [NSString stringWithFormat:@"ViewController : %@", name];
+    [self.nameLabel sizeToFit];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -21,32 +27,37 @@
 
     UILabel *label = [[UILabel alloc] init];
     label.font = [UIFont systemFontOfSize:30];
-    label.text = [NSString stringWithFormat:@"ViewController : %@", @(self.index)];
+    label.text = [NSString stringWithFormat:@"ViewController : %@", self.name];
     [label sizeToFit];
     [self.view addSubview:label];
     label.center = CGPointMake([UIScreen mainScreen].bounds.size.width/2, [UIScreen mainScreen].bounds.size.height/2);
+    self.nameLabel = label;
     
-    NSLog(@"viewDidLoad :    %@", @(self.index));
+    NSLog(@"viewDidLoad :    %@", self.name);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    NSLog(@"Will Appear :    %@", @(self.index));
+    NSLog(@"Will Appear :    %@", self.name);
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    NSLog(@"Did Appear :    %@", @(self.index));
+    NSLog(@"Did Appear :    %@", self.name);
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    NSLog(@"Will Disappear :    %@", @(self.index));
+    NSLog(@"Will Disappear :    %@", self.name);
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    NSLog(@"Did Disappear :    %@", @(self.index));
+    NSLog(@"Did Disappear :    %@", self.name);
+}
+
+- (void)prepareForReuse {
+    NSLog(@"prepareForReuse :    %@", self.name);
 }
 
 /*
