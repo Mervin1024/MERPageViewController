@@ -37,27 +37,30 @@ private extension UIViewController {
 @objc public protocol MERPageViewControllerDelegate {
     /// 即将发起切换
     @objc optional func mer_pageViewController(_ controller: MERPageViewController,
-                                               willTransitionFrom: Int,
+                                               willTransition from: Int,
                                                to: Int,
                                                transitionType: MERPageViewController.TransitionType,
                                                animated: Bool)
     
     /// 完成一次切换
     @objc optional func mer_pageViewController(_ controller: MERPageViewController,
-                                               didTransitionFrom: Int,
+                                               didTransition from: Int,
                                                to: Int,
                                                transitionType: MERPageViewController.TransitionType,
                                                animated: Bool)
     
     /// scrollView 滑动代理
     @objc optional func mer_pageViewController(_ controller: MERPageViewController,
-                                               scrollViewDidScroll: UIScrollView,
+                                               didScroll scrollView: UIScrollView,
                                                transitionType: MERPageViewController.TransitionType)
     
 }
 
 @objc public protocol MERPageViewControllerDataSource {
+    @objc(numberOfControllersInPageViewController:)
     func numberOfControllers(in controller: MERPageViewController) -> Int
+    
+    @objc(mer_pageViewController:controllerAtIndex:)
     func mer_pageViewController(_ controller: MERPageViewController, controllerAt index: Int) -> UIViewController
 }
 
@@ -94,8 +97,6 @@ open class MERPageViewController: UIViewController {
     
     /// 屏幕内需要展示的页面编号
     private var visibleIndexs = VisibleIndexs(0)
-    /// 记录是否正在执行切换伪动画
-    private var isSwitchAnimating = false
     /// 记录执行伪动画的开始时间，用来过滤多个动画执行时，前几个动画的回调
     private var switchAnimationBeginTime: TimeInterval?
     
@@ -204,6 +205,17 @@ open class MERPageViewController: UIViewController {
         }
     }
     
+    private func pageWillTransition(from: Int, to: Int, transitionType: TransitionType, animated: Bool) {
+        self.willTransition(from: from, to: to, transitionType: transitionType, animated: animated)
+        self.delegate?.mer_pageViewController?(self, willTransition: from, to: to, transitionType: transitionType, animated: animated)
+        self.isPageTransiting = true
+    }
+    
+    private func pageDidTransition(from: Int, to: Int, transitionType: TransitionType, animated: Bool) {
+        self.didTransition(from: from, to: to, transitionType: transitionType, animated: animated)
+        self.delegate?.mer_pageViewController?(self, didTransition: from, to: to, transitionType: transitionType, animated: animated)
+        self.isPageTransiting = false
+    }
     
     //MARK: --- Calculate ---
     private func calculateVisibleViewOffset(for index: Int) -> CGPoint {
@@ -298,8 +310,7 @@ open class MERPageViewController: UIViewController {
         if firstWillAppear {
             firstWillAppear = false
             visibleIndexs.end(at: currentIndex)
-            self.willTransition(from: visibleIndexs.from, to: visibleIndexs.to, transitionType: .switching, animated: false)
-            self.delegate?.mer_pageViewController?(self, willTransitionFrom: visibleIndexs.from, to: visibleIndexs.to, transitionType: .switching, animated: false)
+            self.pageWillTransition(from: visibleIndexs.from, to: visibleIndexs.to, transitionType: .switching, animated: false)
         }
         /// 必须与 -endAppearanceTransition 成对出现
         currentController?.beginAppearanceTransition(true, animated: animated)
@@ -310,8 +321,7 @@ open class MERPageViewController: UIViewController {
         let currentController = self.controller(at: currentIndex)
         if firstDidAppear {
             firstDidAppear = false
-            self.didTransition(from: visibleIndexs.from, to: visibleIndexs.to, transitionType: .switching, animated: false)
-            self.delegate?.mer_pageViewController?(self, didTransitionFrom: visibleIndexs.from, to: visibleIndexs.to, transitionType: .switching, animated: false)
+            self.pageDidTransition(from: visibleIndexs.from, to: visibleIndexs.to, transitionType: .switching, animated: false)
             self.visibleIndexs.end(at: currentIndex)
             self.finishChangedCurrentChild()
         }
@@ -413,6 +423,12 @@ open class MERPageViewController: UIViewController {
     /// 是否需要预加载（滑动结束时加载左右两边的 VC）
     @objc public var isPreloadEnabled = false
         
+    /// 是否正在执行切换伪动画
+    @objc public private(set) var isSwitchAnimating = false
+    /// 是否正在切换页面
+    @objc public private(set) var isPageTransiting = false
+    
+
     ///  通过代码直接更改当前显示 VC，区别于手部拖动更改 VC
     ///
     ///  采用模拟滚动动画的形式做切换，并没有使用 UIScrollView 的 setContentOffset 动画
@@ -504,8 +520,7 @@ open class MERPageViewController: UIViewController {
             self.queuingScrollView.panGestureRecognizer.isEnabled = false
             self.switchAnimationContentView.isHidden = false
             /// 添加对应的 VC 到 scrollView 上，并通知代理
-            self.willTransition(from: visible.from, to: visible.to, transitionType: .switching, animated: animated)
-            self.delegate?.mer_pageViewController?(self, willTransitionFrom: visible.from, to: visible.to, transitionType: .switching, animated: animated)
+            self.pageWillTransition(from: visible.from, to: visible.to, transitionType: .switching, animated: animated)
             self.addVisibleViewController(for: visible.to)
             fromVC.beginAppearanceTransition(false, animated: animated)
             toVC.beginAppearanceTransition(true, animated: animated)
@@ -524,8 +539,7 @@ open class MERPageViewController: UIViewController {
             fromVC.endAppearanceTransition()
             toVC.endAppearanceTransition()
             /// 通知结束代理，并清掉不显示的 VC
-            self.didTransition(from: visible.from, to: visible.to, transitionType: .switching, animated: animated)
-            self.delegate?.mer_pageViewController?(self, didTransitionFrom: visible.from, to: visible.to, transitionType: .switching, animated: animated)
+            self.pageDidTransition(from: visible.from, to: visible.to, transitionType: .switching, animated: animated)
             self.visibleIndexs.end(at: visible.to)
             self.finishChangedCurrentChild()
         }
@@ -667,13 +681,12 @@ extension MERPageViewController: UIScrollViewDelegate {
             self.controller(at: toIndex, cacheOnly: true)?.endAppearanceTransition()
         }
         
-        self.didTransition(from: fromIndex, to: visibleIndexs.to, transitionType: .dragging, animated: true)
-        self.delegate?.mer_pageViewController?(self, didTransitionFrom: fromIndex, to: visibleIndexs.to, transitionType: .dragging, animated: true)
+        self.pageDidTransition(from: fromIndex, to: visibleIndexs.to, transitionType: .dragging, animated: true)
         self.finishChangedCurrentChild()
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        self.delegate?.mer_pageViewController?(self, scrollViewDidScroll: scrollView, transitionType: isSwitchAnimating ? .switching : .dragging)
+        self.delegate?.mer_pageViewController?(self, didScroll: scrollView, transitionType: isSwitchAnimating ? .switching : .dragging)
         guard !isSwitchAnimating else { return }
         
         let offsetX = scrollView.contentOffset.x
@@ -701,8 +714,7 @@ extension MERPageViewController: UIScrollViewDelegate {
         let fromVC = self.controller(at: visibleIndexs.from)
         let toVC = self.controller(at: visibleIndexs.to)
         if visibleIndexs.to != currentIndex {
-            self.willTransition(from: currentIndex, to: visibleIndexs.to, transitionType: .dragging, animated: true)
-            self.delegate?.mer_pageViewController?(self, willTransitionFrom: currentIndex, to: visibleIndexs.to, transitionType: .dragging, animated: true)
+            self.pageWillTransition(from: currentIndex, to: visibleIndexs.to, transitionType: .dragging, animated: true)
         }
         
         /// 当前滑动之上还有一次未完成滑动
@@ -742,14 +754,14 @@ extension MERPageViewController: UIScrollViewDelegate {
     @objc optional func prepareForReuse()
 }
 
+private var mer_reusableIdentifierKey: Void?
 private extension UIViewController {
-    static let mer_reusableIdentifierKey = UnsafeRawPointer.init(bitPattern: "mer_reusableIdentifierKey".hashValue)!
     var mer_reusableIdentifier: String? {
         set {
-            objc_setAssociatedObject(self, UIViewController.mer_reusableIdentifierKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &mer_reusableIdentifierKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
         get {
-            objc_getAssociatedObject(self, UIViewController.mer_reusableIdentifierKey) as? String
+            objc_getAssociatedObject(self, &mer_reusableIdentifierKey) as? String
         }
     }
 }

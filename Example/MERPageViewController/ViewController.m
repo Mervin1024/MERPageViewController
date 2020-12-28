@@ -58,11 +58,11 @@
 }
 
 #pragma mark ----------------- MERPageViewControllerDataSource -----------------
-- (NSInteger)numberOfControllersIn:(MERPageViewController *)controller {
+- (NSInteger)numberOfControllersInPageViewController:(MERPageViewController * _Nonnull)controller {
     return self.dataArray.count;
 }
 
-- (UIViewController *)mer_pageViewController:(MERPageViewController *)controller controllerAt:(NSInteger)index {
+- (UIViewController * _Nonnull)mer_pageViewController:(MERPageViewController * _Nonnull)controller controllerAtIndex:(NSInteger)index {
     UIViewController *child = [controller dequeueReusableChild:TestChildViewController.class forIndex:index];
     if ([child isKindOfClass:TestChildViewController.class]) {
         [(TestChildViewController *)child setName:self.dataArray[index]];
@@ -71,15 +71,15 @@
 }
 
 #pragma mark ----------------- MERPageViewControllerDelegate -----------------
-- (void)mer_pageViewController:(MERPageViewController *)controller willTransitionFrom:(NSInteger)willTransitionFrom to:(NSInteger)to transitionType:(enum TransitionType)transitionType animated:(BOOL)animated {
+- (void)mer_pageViewController:(MERPageViewController *)controller willTransition:(NSInteger)from to:(NSInteger)to transitionType:(enum TransitionType)transitionType animated:(BOOL)animated {
     
 }
 
-- (void)mer_pageViewController:(MERPageViewController *)controller didTransitionFrom:(NSInteger)didTransitionFrom to:(NSInteger)to transitionType:(enum TransitionType)transitionType animated:(BOOL)animated {
+- (void)mer_pageViewController:(MERPageViewController *)controller didTransition:(NSInteger)from to:(NSInteger)to transitionType:(enum TransitionType)transitionType animated:(BOOL)animated {
     
 }
 
-- (void)mer_pageViewController:(MERPageViewController *)controller scrollViewDidScroll:(UIScrollView *)scrollViewDidScroll transitionType:(enum TransitionType)transitionType {
+- (void)mer_pageViewController:(MERPageViewController *)controller didScroll:(UIScrollView *)scrollView transitionType:(enum TransitionType)transitionType {
     
 }
 /*

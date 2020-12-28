@@ -63,12 +63,12 @@ extension ViewController_Swift: MERPageViewControllerDataSource, MERPageViewCont
         return child
     }
     
-    func mer_pageViewController(_ controller: MERPageViewController, willTransitionFrom: Int, to: Int, transitionType: MERPageViewController.TransitionType, animated: Bool) {
-//        print("willTransitionFrom \(willTransitionFrom.description)  to \(to.description)")
+    func mer_pageViewController(_ controller: MERPageViewController, willTransition from: Int, to: Int, transitionType: MERPageViewController.TransitionType, animated: Bool) {
+//        print("willTransitionFrom \(from.description)  to \(to.description)")
     }
     
-    func mer_pageViewController(_ controller: MERPageViewController, didTransitionFrom: Int, to: Int, transitionType: MERPageViewController.TransitionType, animated: Bool) {
-//        print("didTransitionFrom \(didTransitionFrom.description)  to \(to.description)")
+    func mer_pageViewController(_ controller: MERPageViewController, didTransition from: Int, to: Int, transitionType: MERPageViewController.TransitionType, animated: Bool) {
+//        print("didTransitionFrom \(from.description)  to \(to.description)")
     }
     
 }
