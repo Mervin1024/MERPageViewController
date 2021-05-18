@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MERPageViewController'
-  s.version          = '1.2.2'
+  s.version          = '1.2.3'
   s.summary          = 'Custom horizontal scroll PageViewController. Support paging scroll and transition with animation.'
 
 # This description is used to generate tags and improve search results.

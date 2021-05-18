@@ -1,8 +1,8 @@
 {
   "name": "MERPageViewController",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "summary": "Custom horizontal scroll PageViewController. Support paging scroll and transition with animation.",
-  "description": "'Because the UIPageViewController has some bugs in UIPageViewControllerTransitionStyleScroll & UIPageViewControllerNavigationOrientationHorizontal, so custom a horizontal scroll PageViewController.'",
+  "description": "'the UIPageViewController has some bugs in UIPageViewControllerTransitionStyleScroll & UIPageViewControllerNavigationOrientationHorizontal, here has a custom horizontal scroll PageViewController.'",
   "homepage": "https://github.com/Mervin1024/MERPageViewController",
   "license": {
     "type": "MIT",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/Mervin1024/MERPageViewController.git",
-    "tag": "1.2.0"
+    "tag": "1.2.2"
   },
   "platforms": {
     "ios": "8.0"
