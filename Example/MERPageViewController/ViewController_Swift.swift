@@ -14,7 +14,7 @@ class ViewController_Swift: UIViewController {
         let controller = MERPageViewController()
         controller.delegate = self
         controller.dataSource = self
-//        controller.isPreloadEnabled = true
+        controller.isPreloadEnabled = true
 //        controller.pageBounces = false
         return controller
     }()
@@ -48,8 +48,6 @@ class ViewController_Swift: UIViewController {
         } while target == pageViewController.currentIndex
         self.pageViewController.showPage(at: target)
     }
-
-
 }
 
 extension ViewController_Swift: MERPageViewControllerDataSource, MERPageViewControllerDelegate {

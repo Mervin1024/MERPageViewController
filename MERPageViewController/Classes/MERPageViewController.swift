@@ -8,8 +8,17 @@
 import UIKit
 
 private class MERQueuingScrollView: UIScrollView {
-//    /// 这里的代码是 fix 页面上有横向 Slider 时，快速滑动无法触发 Slider 滚动事件的问题
+    var mer_isScrollEnabled = true {
+        didSet {
+            self.isScrollEnabled = mer_isScrollEnabled
+        }
+    }
+    
+    /// 这里的代码是 fix 页面上有横向 Slider 时，快速滑动无法触发 Slider 滚动事件的问题
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        guard mer_isScrollEnabled else {
+            return super.hitTest(point, with: event)
+        }
         let result = super.hitTest(point, with: event)
         if result is UISlider {
             self.isScrollEnabled = false
@@ -26,6 +35,7 @@ private extension UIViewController {
         if !contains {
             self.addChild(controller)
         }
+        controller.view.translatesAutoresizingMaskIntoConstraints = true
         controller.view.frame = frame
         if !view.subviews.contains(controller.view) {
             view.addSubview(controller.view)
@@ -110,11 +120,7 @@ open class MERPageViewController: UIViewController {
     private var visibleIndexs = VisibleIndexs(0)
     /// 记录执行伪动画的开始时间，用来过滤多个动画执行时，前几个动画的回调
     private var switchAnimationBeginTime: TimeInterval?
-    
-    private var firstWillAppear = true
-    private var firstDidAppear = true
-    private var firstDidLayoutSubViews = true
-    
+        
     private lazy var queuingScrollView: MERQueuingScrollView = {
         let scrollView = MERQueuingScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -229,6 +235,17 @@ open class MERPageViewController: UIViewController {
         }
     }
     
+    /// 更新 PageViewController 的 contentSize
+    private func updateScrollViewLayoutIfNeeded() {
+        guard self.queuingScrollView.frame.width > 0 else { return }
+        let width = CGFloat(self.pageCount) * self.queuingScrollView.frame.width
+        let height = self.queuingScrollView.frame.height
+        let contentSize = CGSize(width: width, height: height)
+        if contentSize != self.queuingScrollView.contentSize {
+            self.queuingScrollView.contentSize = contentSize
+        }
+    }
+
     private func pageWillTransition(from: Int, to: Int, transitionType: TransitionType, animated: Bool) {
         self.willTransition(from: from, to: to, transitionType: transitionType, animated: animated)
         self.delegate?.mer_pageViewController?(self, willTransition: from, to: to, transitionType: transitionType, animated: animated)
@@ -340,6 +357,7 @@ open class MERPageViewController: UIViewController {
         ])
     }
     
+    private var firstWillAppear = true
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let currentController = self.controller(at: currentIndex)
@@ -352,8 +370,10 @@ open class MERPageViewController: UIViewController {
         currentController?.beginAppearanceTransition(true, animated: animated)
     }
     
+    private var firstDidAppear = true
     override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        viewIsDisappearing = false
         let currentController = self.controller(at: currentIndex)
         if firstDidAppear {
             firstDidAppear = false
@@ -362,8 +382,13 @@ open class MERPageViewController: UIViewController {
             self.finishChangedCurrentChild()
         }
         currentController?.endAppearanceTransition()
+        if reloadDataAfterAppeared {
+            reloadData()
+            reloadDataAfterAppeared = false
+        }
     }
     
+    private var firstDidLayoutSubViews = true
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if firstDidLayoutSubViews {
@@ -375,24 +400,26 @@ open class MERPageViewController: UIViewController {
             }
             self.updateScrollViewLayoutIfNeeded()
             self.updateScrollViewDisplayIndexIfNeeded()
-//            DispatchQueue.main.async {
-//            }
         } else {
             self.updateScrollViewLayoutIfNeeded()
-//            DispatchQueue.main.async {
-//            }
+            self.updateScrollViewDisplayIndexIfNeeded()
         }
     }
     
+    private var viewIsDisappearing = false
     override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        viewIsDisappearing = true
         self.currentViewController?.beginAppearanceTransition(false, animated: animated)
     }
     
     override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        viewIsDisappearing = false
         self.currentViewController?.endAppearanceTransition()
     }
+    
+    private var reloadDataAfterAppeared = false
     
     ///  所有子 VC 使用手动通知生命周期
     override open var shouldAutomaticallyForwardAppearanceMethods: Bool {
@@ -449,13 +476,20 @@ open class MERPageViewController: UIViewController {
     /// 页面是否支持滑动切换，默认为 true
     @objc public var pageScrollEnable: Bool {
         set {
-            self.queuingScrollView.isScrollEnabled = newValue
+            self.queuingScrollView.mer_isScrollEnabled = newValue
         }
         get {
-            self.queuingScrollView.isScrollEnabled
+            self.queuingScrollView.mer_isScrollEnabled
         }
     }
     
+    /// scrollView 的滑动手势
+    public var panGestureRecognizer: UIPanGestureRecognizer {
+        get {
+            return self.queuingScrollView.panGestureRecognizer
+        }
+    }
+
     /// 是否需要预加载（滑动结束时加载左右两边的 VC），默认为 false
     @objc public var isPreloadEnabled = false
         
@@ -683,27 +717,28 @@ open class MERPageViewController: UIViewController {
             return
         }
         
+        if viewIsDisappearing {
+            reloadDataAfterAppeared = true
+            return
+        }
+        
         currentIndex = min(currentIndex, self.pageCount - 1)
         self.cache.removeAll()
         let currentVC = self.controller(at: currentIndex)
+        
+        if let vc = currentVC,
+           vc.isViewLoaded,
+           vc.view.window != nil {
+            reloadDataAfterAppeared = true
+            return
+        }
+
         self.updateScrollViewLayoutIfNeeded()
         self.updateScrollViewDisplayIndexIfNeeded()
         currentVC?.beginAppearanceTransition(true, animated: false)
         currentVC?.endAppearanceTransition()
         self.finishChangedCurrentChild()
     }
-    
-    /// 更新 PageViewController 的 contentSize
-    @objc public func updateScrollViewLayoutIfNeeded() {
-        guard self.queuingScrollView.frame.width > 0 else { return }
-        let width = CGFloat(self.pageCount) * self.queuingScrollView.frame.width
-        let height = self.queuingScrollView.frame.height
-        let contentSize = CGSize(width: width, height: height)
-        if contentSize != self.queuingScrollView.contentSize {
-            self.queuingScrollView.contentSize = contentSize
-        }
-    }
-    
 }
 
 //MARK: --- Subclass Override ---
